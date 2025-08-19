@@ -9,10 +9,10 @@
 library(readxl)
 library(demography)
 library(forecast)
-asihjdiasjkhdjk
+
 
 Mort.2014 <- read_xlsx("CMI Tables Published 2014.xlsx", sheet = 4)
-Mort.2014 <- read_excel("Research project code/CMI Tables Published 2014.xlsx", sheet = 4)
+#Mort.2014 <- read_excel("Research project code/CMI Tables Published 2014.xlsx", sheet = 4)
 
 #Mort.2014 <- read_excel("Research project code/CMI Tables Published 2014.xlsx", sheet = 4, skip =  4) 
 # ABOVE IS EASY WAY TO CLEAN
