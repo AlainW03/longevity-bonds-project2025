@@ -118,3 +118,4 @@ benefit.base$EPV <- apply(benefit.base[, year.cols], 1, function(cashflows) {
 
 # View results
 benefit.base[, c("Member", "Age", "Lifetime", "EPV")]
+
