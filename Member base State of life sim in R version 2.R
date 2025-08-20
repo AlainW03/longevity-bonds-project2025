@@ -195,3 +195,7 @@ plot(density(as.numeric(final.member.base[,2] )+as.numeric(final.member.base[,3]
 # This piece of code should only run once, otherwise it will create duplicates
 
 #write.csv(final.member.base, "Generated State of Life Member Base.csv", row.names = FALSE)
+
+# Note that I think the column names are actually incorrect. I cut off the first n number
+# of years, meaning that the time stamp is n years later than 2014.
+# THough I'll ponder on this thought for a while before I make the change
