@@ -154,18 +154,18 @@ EPV <- c()
 
 for (i in 1:nrow(benefit.base)){
   member.age <- benefit.base[i,2]
-  member.mort.part1 <- c(   mort.table[-c(1:(member.age - index.conv-1),nrow(mort.table)),2] )
-  fill.in.years <- (ncol(member.base) - length(member.mort.part1))
-  member.mort.part2 <- rep(1,max(fill.in.years+1,1))
-  member.mort <- c(member.mort.part1,member.mort.part2)
+  member.px.part1 <- c(   px.table[-c(1:(member.age - index.conv-1),nrow(px.table)),2] )
+  fill.in.years <- (ncol(member.base) - length(member.px.part1))
+  member.px.part2 <- rep(0,max(fill.in.years+1,1))
+  member.px <- c(member.px.part1,member.px.part2)
   
   
   member.tpx.part1 <- c((column.tpx[-c(1:(member.age - index.conv-1))]))/column.tpx[(member.age - index.conv-1)]
   member.tpx.part2 <- rep(0,max(fill.in.years+1,1))
   member.tpx <- c(member.tpx.part1[-length(member.tpx.part1)],member.tpx.part2)
-  member.v <- v^c(1:length(member.mort))
+  member.v <- v^c(1:length(member.px))
   
-  member.epv <- sum(member.v * member.mort * member.tpx[-length(member.tpx)] * benefit.base[i,4])
+  member.epv <- sum(member.v * member.px * member.tpx[-length(member.tpx)] * benefit.base[i,4])
   
   EPV <- c(EPV, member.epv)
 }
