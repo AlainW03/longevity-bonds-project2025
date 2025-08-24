@@ -102,8 +102,8 @@ benefit.base <- as.data.frame(cbind(member.base[,1:3], benefit.base))
 #head(benefit.base)
 
 # Discount rate 
-i <- 0.05
-v <- (1+increase/100) / (1 + i)
+interest <- 0.045
+v <- (1+increase/100) / (1 + interest)
 
 # Identify the columns with the yearly cashflows
 year.cols <- grep("^\\d{4}$", names(benefit.base))
@@ -125,7 +125,10 @@ options(scipen = 999)
 #Pulling relevant mortality table
 
 mort.table <- read.csv("LC Mortality Data.csv")
-mort.table <- mort.table[,c(1,2)]
+#Also adding a risk margin for lower than expected mortality
+risk.margin <- 10
+mort.table <- cbind(mort.table[,1], mort.table[,2]*(1- risk.margin/100))
+colnames(mort.table) <- c("Ages", "qx")
 #Pulling ages for table construction
 ages <- mort.table[,1]
 #px column
@@ -171,3 +174,15 @@ for (i in 1:nrow(benefit.base)){
 }
 
 benefit.base$EPV <- EPV
+
+#For now remove the last EPV column for the sake of the Fund sim
+benefit.base <- benefit.base[,- ncol(benefit.base)]
+
+Fund <- Original.Fund <- sum(EPV)
+for(i in 2:(ncol(benefit.base)-3)){
+  
+  Fund[i] <- Fund[i-1] * (1+interest) - sum(benefit.base[,i+2])
+  
+  
+}
+
