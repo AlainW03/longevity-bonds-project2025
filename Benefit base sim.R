@@ -103,7 +103,7 @@ benefit.base <- as.data.frame(cbind(member.base[,1:3], benefit.base))
 
 # Discount rate 
 i <- 0.05
-v <- 1 / (1 + i)
+v <- (1+increase/100) / (1 + i)
 
 # Identify the columns with the yearly cashflows
 year.cols <- grep("^\\d{4}$", names(benefit.base))
@@ -119,3 +119,57 @@ benefit.base$EPV <- apply(benefit.base[, year.cols], 1, function(cashflows) {
 # View results
 benefit.base[, c("Member", "Age", "Lifetime", "EPV")]
 
+#Edit:
+#Avoiding scientific notation
+options(scipen = 999)
+#Pulling relevant mortality table
+
+mort.table <- read.csv("LC Mortality Data.csv")
+mort.table <- mort.table[,c(1,2)]
+#Pulling ages for table construction
+ages <- mort.table[,1]
+#px column
+column.px <- 1- mort.table[,2]
+#Creating a px table
+px.table <- cbind(ages,column.px)
+#Creating tpx column
+
+column.tpx <- c(1)
+for (i in 1:length(column.px)){
+  
+  p <- column.px[i]
+  t <- column.tpx[i]
+  tp <- p*t
+  column.tpx <- c(column.tpx,tp)
+}
+
+#using as.numeric to get rid of scientific notation
+
+
+#Discounting columns
+v.column <- v^c(1:(length(member.base[,-c(1:3)])))
+
+#index.converter
+index.conv <- mort.table[1,1] - 1
+
+EPV <- c()
+
+for (i in 1:nrow(benefit.base)){
+  member.age <- benefit.base[i,2]
+  member.mort.part1 <- c(   mort.table[-c(1:(member.age - index.conv-1),nrow(mort.table)),2] )
+  fill.in.years <- (ncol(member.base) - length(member.mort.part1))
+  member.mort.part2 <- rep(1,max(fill.in.years+1,1))
+  member.mort <- c(member.mort.part1,member.mort.part2)
+  
+  
+  member.tpx.part1 <- c((column.tpx[-c(1:(member.age - index.conv-1))]))/column.tpx[(member.age - index.conv-1)]
+  member.tpx.part2 <- rep(0,max(fill.in.years+1,1))
+  member.tpx <- c(member.tpx.part1[-length(member.tpx.part1)],member.tpx.part2)
+  member.v <- v^c(1:length(member.mort))
+  
+  member.epv <- sum(member.v * member.mort * member.tpx[-length(member.tpx)] * benefit.base[i,4])
+  
+  EPV <- c(EPV, member.epv)
+}
+
+benefit.base$EPV <- EPV
