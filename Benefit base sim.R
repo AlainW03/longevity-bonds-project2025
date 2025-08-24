@@ -143,8 +143,6 @@ for (i in 1:length(column.px)){
   column.tpx <- c(column.tpx,tp)
 }
 
-#using as.numeric to get rid of scientific notation
-
 
 #Discounting columns
 v.column <- v^c(1:(length(member.base[,-c(1:3)])))
