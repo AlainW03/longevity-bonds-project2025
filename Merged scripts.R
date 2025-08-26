@@ -1148,7 +1148,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  # Male and Female populations, but rather a mix.
  
  # Thus we can make the assumption that the proportion is calculated
- # on the same ration of Male to Female lives as in the 1st year of
+ # on the same ratio of Male to Female lives as in the 1st year of
  # our member base, as that will be the closest match we can make the bond 
  # to the liabilities.
  }
