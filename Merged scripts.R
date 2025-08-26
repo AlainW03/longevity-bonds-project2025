@@ -1,5 +1,5 @@
-# This is the merged model of the seperate individual models.
-# Press Alt+0 to collapse all foldable sections, it makes it a lot easier to read
+# This is the merged model of the separate individual models.
+# Press Alt+0 to collapse all fold-able sections, it makes it a lot easier to read
 # Why do we do this?
 {
 # Well, to measure the effect of the longevity bonds, we need to first 
@@ -365,7 +365,7 @@ Mortality.Table <- Final.Mort.table
 
 #///////////////////////////////////////////////////////////////////////////////
   #Setting number of members at time 0
-  num.members <- 10
+  num.members <- 100
   # This is where we mainly control the size of this script, hence I moved it here
 #//////////////////////////////////////////////////////////////////////////////
 
@@ -748,7 +748,7 @@ Mortality.Table <- Final.Mort.table
    #Calculating the EPV and Fund
    {
    # Discount rate 
-   interest <- 0.045
+   interest <- 0.07
    v <- (1+increase/100) / (1 + interest)
    
    # Identify the columns with the yearly cashflows
@@ -840,5 +840,6 @@ Mortality.Table <- Final.Mort.table
  
  # Now to keep only the main items in the environment
  rm(list = setdiff(ls(), c("Mortality.Table","member.base", "benefit.base", "EPV", "Fund")))
+ # That's it for now
  
  
