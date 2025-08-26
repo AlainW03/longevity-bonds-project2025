@@ -563,7 +563,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
 
 #///////////////////////////////////////////////////////////////////////////////
   #Setting number of members at time 0
-  num.members <- 100
+  num.members <- 10
   # This is where we mainly control the size of this script, hence I moved it here
 #//////////////////////////////////////////////////////////////////////////////
 
@@ -588,8 +588,9 @@ Female.Mortality.Table <- Final.Female.Mort.table
   
   
   #Getting the lowest and highest age in the table for later use
-  lowest.age <- as.numeric(  min(Mortality.Table[,1])  )
-  highest.age <- as.numeric(  max(Mortality.Table[,1])  )
+  
+  lowest.age <- as.numeric(  min((Male.Mortality.Table[,1])  ))
+  highest.age <- as.numeric(  max(Female.Mortality.Table[,1])  )
   
   #Setting seed for consistency (Removing seed)
   #set.seed(780)
@@ -607,6 +608,13 @@ Female.Mortality.Table <- Final.Female.Mort.table
   
   #Creating the index for our members
   members <- c(1:num.members)
+  
+  #Now to differentiate between Males and Females.
+  # This is going to be assigned 50:50, as we expect the true mix
+  # to be closer to 50:50
+  # I'm having trouble with the char class, so 1 will be Male, 2 will be Female
+  
+  Gender <- sample(c(1,2), size = num.members, replace = TRUE)
   
   
 
@@ -675,6 +683,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
       }
     } # Members and their ages are now decided
     
+
   
   
   
@@ -686,8 +695,8 @@ Female.Mortality.Table <- Final.Female.Mort.table
   # of the ages to have taken the shape one would see in a pension scheme.
   
   #Creating an empty space for member base to occupy later
-    #Columns must equal the years + 2 (1 for index, 1 for ages, rest for years)
-    member.base <- matrix(0, nrow = num.members, ncol = num.years+2)
+    #Columns must equal the years + 3 (1 for index, 1 for ages, 1 for gender, rest for years)
+    member.base <- matrix(0, nrow = num.members, ncol = num.years+3)
   
   {
     #Creating a count variable to help set rows in member base
@@ -700,24 +709,29 @@ Female.Mortality.Table <- Final.Female.Mort.table
       prev_state <- 1
       
       #creating an empty row for the member info to occupy
-      member_row <- c(matrix(0,nrow = 1, ncol = num.years+2))
+      member_row <- c(matrix(0,nrow = 1, ncol = num.years+3))
       
-      #Added 2 columns, the first the member index, the second the member's age
+      #Added 3 columns, the first the member index, the second is the gender,
+      # the third the member's age
+      # Though Gender and Age will have to switch around later for the rest of
+      # the merged model to work. They are in this order since this
+      # particular loop relies on the age being the last of the non state columns
       member_row[1] <- i
-      member_row[2] <- ages[i]
+      member_row[3] <- ages[i]
+      member_row[2] <- Gender[i]
       
-      #Simulating state of life for member i from column 3 onwards
-      #(hence time 1 is column 3)
-      for(j in 3:num.years){
+      #Simulating state of life for member i from column 4 onwards
+      #(hence time 1 is column 4)
+      for(j in 4:num.years){
         
-        #Thus j-2 is the time point of the state being simulated
+        #Thus j-3 is the time point of the state being simulated
         
         #Unif q probability
         value <- runif(1,0,1)
         
         #Getting the current age of the member, as at point j
         #Including column 2 in here, since that is the original age
-        current_age <-  sum(member_row[2:length(member_row)])
+        current_age <-  sum(member_row[3:length(member_row)])
         
         #Ensuring that the member's age does not exceed 110
         
@@ -727,8 +741,11 @@ Female.Mortality.Table <- Final.Female.Mort.table
         #getting the index of the member's age in the mortality table
         index_age <- y-(lowest.age-1)
         
-        #Getting qx for the member's age
-        qx <- as.numeric(Mortality.Table[index_age,j-1])
+        #Getting qx according to the member's age and gender
+        gender <- member_row[2]
+        if (gender == 2) {
+          qx <- as.numeric(Female.Mortality.Table[index_age,j-2])}else{
+            qx <- as.numeric(Male.Mortality.Table[index_age,j-2])}
         
         #State of life determined by generated q prob and the qx in mortality table
         state <- prev_state*qbinom(value,size = 1, prob = 1 - qx)
@@ -751,14 +768,14 @@ Female.Mortality.Table <- Final.Female.Mort.table
     
     #Adding a lifetime column for analysis and error checking
     
-    Lifetime <- apply(X = member.base[,3:ncol(member.base)],FUN = sum, MARGIN = 1)
-    member.base <- cbind(member.base[,1:2], Lifetime, member.base[,3:ncol(member.base)] )
+    Lifetime <- apply(X = member.base[,4:ncol(member.base)],FUN = sum, MARGIN = 1)
+    member.base <- cbind(member.base[,c(1,3,2)], Lifetime, member.base[,4:ncol(member.base)] )
     
     #Giving column headings
-    colnames(member.base) <- c("Member","Age", "Lifetime",1:(num.years))
+    colnames(member.base) <- c("Member","Age","Gender", "Lifetime",1:(num.years))
     
     #Error checking for member with maximum lifetimes
-    member.base[which.max(member.base[,3]),1]
+    member.base[which.max(member.base[,4]),1]
     
     #Everything seems to be in order
   }
@@ -767,20 +784,22 @@ Female.Mortality.Table <- Final.Female.Mort.table
   
   cut_off <- 30
   
-  final.member.base <- member.base[member.base[,cut_off]==1,c(1,2,3,cut_off:ncol(member.base))]
-  colnames(final.member.base) <- c("Member","Age", "Lifetime",1:((ncol(final.member.base)-3  ) )   )       
+  final.member.base <- member.base[member.base[,cut_off]==1,c(1:4,cut_off:ncol(member.base))]
+  colnames(final.member.base) <- c("Member","Age", "Gender", "Lifetime",1:((ncol(final.member.base)-4  ) )   )       
   
   # of course, everyone is cut_off amount years older by this point, so we will need to adjust the ages too
   
   final.member.base[,2] <- final.member.base[,2] + cut_off
-  final.member.base[,3] <- final.member.base[,3] - (cut_off-4)
+  #Adjusting the lifetime, I have to minus 5, that's just how it ended up needing
+  # to be corrected
+  final.member.base[,4] <- final.member.base[,4] - (cut_off-5)
   }
   
   
   #There we have it. Now I just increase the number of members, and we should have a nice
   # member base
   
-  #For curiosity sake, let's look at how the distribution of ages ended up to be:
+  #For curiosity sake, let's look at how the distribution of ages and gender ended up to be:
   {
   #plot(density(as.numeric(final.member.base[,2] )), main = "Density of Final Member Base Ages", xlab = "Ages")
   
@@ -813,7 +832,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  member.base <- as.data.frame(final.member.base)
  
  #Also, the member base is excessively long, let's trim it down
- member.base <- member.base[,1:(max(member.base[,3])+4)]
+ member.base <- member.base[,1:(max(member.base[,4])+4)]
  
 # Run this line below to remove all but Mortality.Table and member.base from your environment
  rm(list = setdiff(ls(), c("Male.Mortality.Table","Female.Mortality.Table","member.base")))
