@@ -1240,6 +1240,3 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Fund",
                            "coupon.prop")))
  
- 
- #I ASSUMED THE "coupon.prop" is the proportiuon of lives
- 
