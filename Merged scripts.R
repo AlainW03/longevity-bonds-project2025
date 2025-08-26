@@ -1108,19 +1108,135 @@ Female.Mortality.Table <- Final.Female.Mort.table
  # EPV
  # Fund
  
- 
- 
- 
- 
  # I have to stress that the mortality rates in the first column is not our
  # member base's current mortality rate, but rather the 30th column, the cut_off
  # point in the member base model.
  
- 
- 
- 
  # Now to keep only the main items in the environment
- rm(list = setdiff(ls(), c("Male.Mortality.Table","Female.Mortality.Table","member.base", "benefit.base", "EPV", "Fund")))
- # That's it for now
+ rm(list = setdiff(ls(), c("cut_off","Male.Mortality.Table",
+                           "Female.Mortality.Table","member.base", 
+                           "benefit.base", 
+                           "EPV", 
+                           "Fund")))
+
  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ # Next, let's create the proportions needed for calculating the coupons
+ # paid at each time point.
+ 
+ {
+ 
+ # We'll need to decide on a reference population, both age and gender. First, 
+ # the assumption on the reference population's age:
+ 
+ reference.population.age <- 65
+ 
+ # Explaining reference population gender assumption:
+ {
+ # For the coupons, you'll need the realized tpx's of Male and Female lives
+ # But, the bond's coupon dynamics does not allow for a distinction between
+ # Male and Female populations, but rather a mix.
+ 
+ # Thus we can make the assumption that the proportion is calculated
+ # on the same ration of Male to Female lives as in the 1st year of
+ # our member base, as that will be the closest match we can make the bond 
+ # to the liabilities.
+ }
+ 
+ # So we get the ratio's:
+ {
+ male.ratio <- mean(member.base$Gender == 1)
+ female.ratio <- 1 - male.ratio 
+ }
+ 
+ # Now we get the tpx's of our reference population
+ 
+ # Index converter to get the indexed age correct
+ index.conv <- Male.Mortality.Table[1,1] - 1
+ 
+ # Row of the reference population's age
+ row.reference.pop.age <- reference.population.age - index.conv
+ 
+ 
+ 
+ # Now we need to get the step wise qx's from our row.reference.pop.age down
+ # to the terminal age, for each the males and females
+ 
+ 
+ # Keep in mind, our current population's mortality rates are on the 31st column
+ # (30th column of the rates, and the 1st column is age, hence 31st column)
+ # of the mortality table, given cut_off is still equal to 30. Though, I made
+ # it dynamic so it still works with a different cut_off value
+ {
+ male.qx <- c() # Creating an empty qx for the for loop below
+ female.qx <- c()
+ 
+ # Determining the amount of Rows Below the Reference Age
+ rbra <- nrow(Male.Mortality.Table) - (row.reference.pop.age)
+ 
+ row.age.forloop <- row.reference.pop.age # Creating a new row index age to use in loop
+ 
+ for (i in (cut_off+1):(cut_off+rbra+1)) {
+   
+   male.qx <- c(male.qx,Male.Mortality.Table[row.age.forloop,i])
+   female.qx <- c(female.qx,Female.Mortality.Table[row.age.forloop,i])
+   
+   row.age.forloop <- row.age.forloop + 1
+   
+ }
+ 
+ 
+ }
+ 
+ # Now to get the relevant px's and finally the tpx's of both genders
+ {
+ male.px <- 1- male.qx
+ female.px <- 1- female.qx
+ 
+ male.tpx <- c(1)
+ female.tpx <- c(1)
+ 
+ # male tpx loop
+ for (i in 1:length(male.px)){
+   
+   p <- male.px[i]
+   t <- male.tpx[i]
+   tp <- p*t
+   male.tpx <- c(male.tpx,tp)
+ }
+ 
+ # female tpx loop
+ for (i in 1:length(female.px)){
+   
+   p <- female.px[i]
+   t <- female.tpx[i]
+   tp <- p*t
+   female.tpx <- c(female.tpx,tp)
+ }
+ }
+ 
+ # Thus the proportions used for the coupon calculation is:
+ coupon.prop <- male.ratio*male.tpx + female.ratio*female.tpx
+ 
+ }
+ # The important outputs of the model above are:
+ #coupon.prop
+ 
+ # Now to keep only the main relevant items in the environment
+ rm(list = setdiff(ls(), c("cut_off","Male.Mortality.Table",
+                           "Female.Mortality.Table","member.base", 
+                           "benefit.base", 
+                           "EPV", 
+                           "Fund",
+                           "coupon.prop")))
  
