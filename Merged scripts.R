@@ -607,7 +607,11 @@ Mortality.Table <- Final.Mort.table
 }
 
 
+#<<<<<<< HEAD
 # The result of the model above is called final.member.base
+#=======
+# The result of the model is called final.member.base
+#>>>>>>> 1c614dd2e0ac189cd320bd2eeb992ab51d30d41e
 # To link the member base model to the next model, we change the name of final.member.base
 # to member.base
  member.base <- as.data.frame(final.member.base)
