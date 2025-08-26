@@ -1,6 +1,7 @@
 # This is the merged model of the seperate individual models.
-
+# Press Alt+0 to collapse all foldable sections, it makes it a lot easier to read
 # Why do we do this?
+{
 # Well, to measure the effect of the longevity bonds, we need to first 
 # get measures that longevity influences.
 
@@ -19,12 +20,12 @@
 
 # Also, we can't just copy and paste everything and expect it to work.
 # I mean, it can work theoretically, but the models will need to be linked to
-# each other. This means no creating csv files, no reading column names, 
-# no cleaning of the data, no re-determining the dimensions, etc.
+# each other. This means no creating or importing csv files
 
 # Luckily for me, my style of coding has set the places where the links should 
 # happen close to the start or end of the script, with very few exceptions here
 # and there.
+}
 
 # Let's go!
 
@@ -52,13 +53,13 @@ set.seed(780)
   library(demography)
   library(forecast)
   
-  #########################################################################################
+  #/////////////////////////////////////////////////////////////////////////////
   Mort.2014 <- read_xlsx("CMI Tables Published 2014.xlsx", sheet = 4)
   #Mort.2014 <- read_excel("Research project code/CMI Tables Published 2014.xlsx", sheet = 4)
   
   #Mort.2014 <- read_excel("Research project code/CMI Tables Published 2014.xlsx", sheet = 4, skip =  4) 
   # ABOVE IS EASY WAY TO CLEAN
-  ##########################################################################################
+  #////////////////////////////////////////////////////////////////////////////
   
   #Ok, that looks nasty, let's clean that up...
   
@@ -362,11 +363,11 @@ Mortality.Table <- Final.Mort.table
 
 
 
-###################################################################################
+#///////////////////////////////////////////////////////////////////////////////
   #Setting number of members at time 0
   num.members <- 10
   # This is where we mainly control the size of this script, hence I moved it here
-####################################################################################
+#//////////////////////////////////////////////////////////////////////////////
 
 
  
@@ -671,20 +672,20 @@ Mortality.Table <- Final.Mort.table
    # can obscure the longevity risk that we are trying to target here, hence the assumption.
    
    }
+   
    # Pulling the member base model. Not needed since now the model is linked
-   #library(readxl)
+   {#library(readxl)
    #member.base <- read.csv("Generated State of Life Member Base.csv")
    # I don't like the X's in front of the years, so I'm removing them like this:
-   colnames(member.base) <- c(colnames(member.base[,1:3]), 2014:(2014 + length(colnames(member.base))-4))
+   #colnames(member.base) <- c(colnames(member.base[,1:3]), 2014:(2014 + length(colnames(member.base))-4))
    # Of course, check whether the first year is actually 2014 first
    
    #Also, the member base is excessively long, let's trim it down
-   member.base <- member.base[,1:(max(member.base[,3])+4)]
+   #member.base <- member.base[,1:(max(member.base[,3])+4)]
+   }
    
-   # Now, let's include increases....
-   # Now I have to justify the inflation increase!
-   
-   # Running the member base sim with 10 000 members multiple times (seed removed),
+   # Now I justify the inflation increase
+   {# Running the member base sim with 10 000 members multiple times (seed removed),
    # we see that the average lifespan for our members are:
    # 12.11028
    # 12.36846
@@ -709,9 +710,9 @@ Mortality.Table <- Final.Mort.table
    # set a more accurate representation of future inflation, though I do
    # think have an increase is relevant enough to the point of including it
    # in the model.
-   
+   }
    # This is to confirm the multiplication I need to apply later
-   temp1 <- c(1.1,1.2,1.3)
+   {temp1 <- c(1.1,1.2,1.3)
    temp2 <- matrix(c(1,2,3,1,2,3,1,2,3), nrow = 3, byrow = TRUE) 
    t(temp1 * t(temp2))
    
@@ -721,8 +722,10 @@ Mortality.Table <- Final.Mort.table
    # 1.1  2.4  3.9
    # And that's what I got
    
+   }
    
-   
+   # Now, let's include increases....
+   {
    #Now to generate the vector of benefit increases
    #Set the increase as a value between 0 and 100
    increase <- 4
@@ -730,23 +733,20 @@ Mortality.Table <- Final.Mort.table
    for(i in 1:(length(member.base)-4)) {
      increase_vec <- c(increase_vec, (increase_vec[i])*(1+increase/100))
    }
+   }
    
    # Now to generate the benefit values:
-   
+   {
    level_of_benefit <- 1000
    
    benefit.base <- t(increase_vec * t(level_of_benefit*member.base[,-c(1:3)]))
-   
+   }
    # Now we have the benefits, let's tidy it up
    
    benefit.base <- as.data.frame(cbind(member.base[,1:3], benefit.base))
    
-   
-   #-------------------------------------------------------------------------------
-   #Calculating the EPV
-   #-------------------------------------------------------------------------------
-   #head(benefit.base)
-   
+   #Calculating the EPV and Fund
+   {
    # Discount rate 
    interest <- 0.045
    v <- (1+increase/100) / (1 + interest)
@@ -764,11 +764,12 @@ Mortality.Table <- Final.Mort.table
    
    # View results
    benefit.base[, c("Member", "Age", "Lifetime", "EPV")]
-   
+#/////////////////////////////////////////////////////////////////////////////   
    #Edit:
    #Avoiding scientific notation
    options(scipen = 999)
    #Pulling relevant mortality table
+   benefit.base <- benefit.base[,- ncol(benefit.base)]
    
    mort.table <- read.csv("LC Mortality Data.csv")
    #Also adding a risk margin for lower than expected mortality
@@ -819,19 +820,25 @@ Mortality.Table <- Final.Mort.table
      EPV <- c(EPV, member.epv)
    }
    
-   benefit.base$EPV <- EPV
+   # Let's make a complete EPV data frame for each member
+   EPV <- as.data.frame(cbind(benefit.base[,c(1,2,3)], EPV))
    
-   #For now remove the last EPV column for the sake of the Fund sim
-   benefit.base <- benefit.base[,- ncol(benefit.base)]
-   
-   Fund <- Original.Fund <- sum(EPV)
+   Fund <- Original.Fund <- sum(EPV[,4])
    for(i in 2:(ncol(benefit.base)-3)){
      
      Fund[i] <- Fund[i-1] * (1+interest) - sum(benefit.base[,i+2])
      
      
    }
-   
-   
-   
+   }
  }
+ 
+ # The results of this model is
+ # benefit.base
+ # EPV
+ # Fund
+ 
+ # Now to keep only the main items in the environment
+ rm(list = setdiff(ls(), c("Mortality.Table","member.base", "benefit.base", "EPV", "Fund")))
+ 
+ 
