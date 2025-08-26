@@ -1240,3 +1240,14 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Fund",
                            "coupon.prop")))
  
+#I assumed "coupon.prop" is the rate that we times by the fixed percentage and is equivalent to lx/l(65)
+ 
+fixed_percentage <- 0.155 #please change to number appropriate
+notional <- sum(EPV$EPV) #100% OF CURRENT FUNDS --> CORRECT ME IF WRONG
+ 
+longevity_bonds_cashflows <- fixed_percentage*notional*coupon.prop
+
+discount_rate <- 0.03 #just put something in to work for now 
+years <- seq_along(longevity_bonds_cashflows)
+discount_factors <- 1 / ((1 + discount_rate)^years)
+PV_longevity_bond <- sum(longevity_bonds_cashflows * discount_factors)
