@@ -96,26 +96,116 @@ benefit.base <- t(increase_vec * t(level_of_benefit*member.base[,-c(1:3)]))
 benefit.base <- as.data.frame(cbind(member.base[,1:3], benefit.base))
 
 
+
 #-------------------------------------------------------------------------------
 #Calculating the EPV
 #-------------------------------------------------------------------------------
-#head(benefit.base)
+Mortality.Table <- read.csv("LC Mortality Data.csv")
+#NEED TO RUN ALL THE CODE FROM MEMBER BASE TO GET FINAL MEMBER BASE 
+final.member.base <- as.data.frame(final.member.base)
 
-# Discount rate 
-i <- 0.05
-v <- 1 / (1 + i)
+library(dplyr)
+library(purrr)
+library(tidyr)
 
-# Identify the columns with the yearly cashflows
-year.cols <- grep("^\\d{4}$", names(benefit.base))
+# =========================
+# Inputs you control
+# =========================
+i <- 0.05          # annual effective discount rate
+j <- 0.03          # annual escalation rate
+monthly_payment <- 1000
+terminal_age <- 120
 
-# Calculate Expected Present Value (EPV) for each member
-benefit.base$EPV <- apply(benefit.base[, year.cols], 1, function(cashflows) {
+# =========================
+# 1) Prepare mortality table: keep only Age and 2014, rename to qx, build px
+# =========================
+mortality2014 <- Mortality.Table %>%
+  select(Age, `2014`) %>%
+  rename(qx = `2014`) %>%
+  arrange(Age) %>%
+  filter(Age <= terminal_age)
 
-  n <- sum(cashflows > 0)
-  
-  sum(cashflows[1:n] * v^(0:(n-1)))
+# force qx = 1 at terminal age, so the process ends
+if (!any(mortality2014$Age == terminal_age)) {
+  mortality2014 <- bind_rows(mortality2014, tibble(Age = terminal_age, qx = 1))
+} else {
+  mortality2014$qx[mortality2014$Age == terminal_age] <- 1
+}
+
+mortality2014 <- mortality2014 %>%
+  mutate(px = pmax(0, 1 - qx)) %>%
+  arrange(Age)
+
+# sanity: ages must be consecutive integers
+stopifnot(all(diff(mortality2014$Age) == 1))
+
+# =========================
+# 2) Prepare member base: select the id and the age only
+#    Adjust the column names here if yours differ
+# =========================
+members <- final.member.base %>%
+  transmute(Member = Member, StartAge = Age) %>%   # change if your id column has a different name
+  mutate(StartAge = as.integer(StartAge))
+
+# =========================
+# 3) Survival paths by starting age used in the book
+#    We compute once per StartAge to avoid unnecessary rows
+# =========================
+unique_start_ages <- sort(unique(members$StartAge))
+
+survival_by_age <- map_dfr(unique_start_ages, function(x){
+  mt <- mortality2014 %>% filter(Age >= x)
+  tibble(
+    StartAge    = x,
+    AttainedAge = mt$Age,
+    qx          = mt$qx,
+    px          = mt$px,
+    surv        = cumprod(mt$px)   # {}_t p_x for t = 1.. (alive to start of each year t)
+  )
 })
 
-# View results
-benefit.base[, c("Member", "Age", "Lifetime", "EPV")]
+# If you want survival by member, join (this will be many rows, which is normal)
+survival_by_member <- members %>%
+  left_join(survival_by_age, by = "StartAge")
 
+# =========================
+# 4) Annuity factors by starting age using recursion at the net rate
+#    Growth j can be priced by using i_net = (1+i)/(1+j) - 1 for a level stream
+#    We compute immediate timing (end of year payments)
+# =========================
+i_net <- (1 + i) / (1 + j) - 1
+v_net <- 1 / (1 + i_net)
+
+ages <- mortality2014$Age
+px_vec <- mortality2014$px
+names(px_vec) <- as.character(ages)
+
+# a_immediate[x] satisfies: a_x = v_net * p_x * (1 + a_{x+1})
+a_immediate <- numeric(length(px_vec))
+names(a_immediate) <- names(px_vec)
+a_immediate[as.character(terminal_age)] <- 0
+
+for (age in rev(ages[-length(ages)])) {
+  p <- px_vec[as.character(age)]
+  a_next <- a_immediate[as.character(age + 1)]
+  a_immediate[as.character(age)] <- v_net * p * (1 + a_next)
+}
+
+annuity_factors <- tibble(
+  StartAge     = as.integer(names(a_immediate)),
+  a_immediate  = as.numeric(a_immediate)
+) %>%
+  filter(StartAge %in% unique_start_ages)
+
+# =========================
+# 5) EPV per member for monthly 1 000 with annual escalation j
+#    We price as 12 000 per year at net rate, then scale by the survival factor a_x
+# =========================
+epv_per_member <- members %>%
+  left_join(annuity_factors, by = "StartAge") %>%
+  mutate(EPV = 12 * monthly_payment * a_immediate) %>%
+  select(Member, StartAge, EPV)
+
+# Optional checks
+stopifnot(nrow(epv_per_member) == nrow(members))
+# View head(epv_per_member); head(survival_by_member)
