@@ -824,8 +824,14 @@ Female.Mortality.Table <- Final.Female.Mort.table
   
 }
 
+  
+  
+# Just to reiterate here, in the data sets the Genders are labelled:
+  
+# Male = 1
+# Female = 2
 
-
+  
 # The result of the model above is called final.member.base
 # To link the member base model to the next model, we change the name of final.member.base
 # to member.base
@@ -834,8 +840,10 @@ Female.Mortality.Table <- Final.Female.Mort.table
  #Also, the member base is excessively long, let's trim it down
  member.base <- member.base[,1:(max(member.base[,4])+4)]
  
+ #cut_off needs to be retained for the next model
+ 
 # Run this line below to remove all but Mortality.Table and member.base from your environment
- rm(list = setdiff(ls(), c("Male.Mortality.Table","Female.Mortality.Table","member.base")))
+ rm(list = setdiff(ls(), c( "cut_off","Male.Mortality.Table","Female.Mortality.Table","member.base")))
  
  
  
@@ -947,7 +955,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
    #Set the increase as a value between 0 and 100
    increase <- 4
    increase_vec <- c(1)
-   for(i in 1:(length(member.base)-4)) {
+   for(i in 1:(length(member.base)-5)) {
      increase_vec <- c(increase_vec, (increase_vec[i])*(1+increase/100))
    }
    }
@@ -956,11 +964,11 @@ Female.Mortality.Table <- Final.Female.Mort.table
    {
    level_of_benefit <- 1000
    
-   benefit.base <- t(increase_vec * t(level_of_benefit*member.base[,-c(1:3)]))
+   benefit.base <- t(increase_vec * t(level_of_benefit*member.base[,-c(1:4)]))
    }
    # Now we have the benefits, let's tidy it up
    
-   benefit.base <- as.data.frame(cbind(member.base[,1:3], benefit.base))
+   benefit.base <- as.data.frame(cbind(member.base[,1:4], benefit.base))
    
    #Calculating the EPV and Fund
    {
@@ -985,42 +993,84 @@ Female.Mortality.Table <- Final.Female.Mort.table
    #Edit:
    #Avoiding scientific notation
    options(scipen = 999)
-   #Pulling relevant mortality table
+   #Pulling relevant benefits
    benefit.base <- benefit.base[,- ncol(benefit.base)]
    
-   mort.table <- read.csv("LC Mortality Data.csv")
    #Also adding a risk margin for lower than expected mortality
    risk.margin <- 10
-   mort.table <- cbind(mort.table[,1], mort.table[,2]*(1- risk.margin/100))
-   colnames(mort.table) <- c("Ages", "qx")
-   #Pulling ages for table construction
-   ages <- mort.table[,1]
-   #px column
-   column.px <- 1- mort.table[,2]
-   #Creating a px table
-   px.table <- cbind(ages,column.px)
-   #Creating tpx column
    
-   column.tpx <- c(1)
-   for (i in 1:length(column.px)){
+   #Pulling and adjusting relevant  Male mortality table
+   {
+     mort.table <- Male.Mortality.Table[,c(1,cut_off)]
+     mort.table <- cbind(mort.table[,1], mort.table[,2]*(1- risk.margin/100))
+     colnames(mort.table) <- c("Ages", "qx")
+     #Pulling ages for table construction
+     ages <- mort.table[,1]
+     #male.px column
+     column.male.px <- 1- mort.table[,2]
+     #Creating a male.px table
+     male.px.table <- cbind(ages,column.male.px)
+     #Creating male.tpx column
      
-     p <- column.px[i]
-     t <- column.tpx[i]
-     tp <- p*t
-     column.tpx <- c(column.tpx,tp)
+     column.male.tpx <- c(1)
+     for (i in 1:length(column.male.px)){
+       
+       p <- column.male.px[i]
+       t <- column.male.tpx[i]
+       tp <- p*t
+       column.male.tpx <- c(column.male.tpx,tp)
+     }
+     
+   }
+   #Pulling and adjusting relevant  Female mortality table
+   {
+     mort.table <- Female.Mortality.Table[,c(1,cut_off)]
+     mort.table <- cbind(mort.table[,1], mort.table[,2]*(1- risk.margin/100))
+     colnames(mort.table) <- c("Ages", "qx")
+     #Pulling ages for table construction
+     ages <- mort.table[,1]
+     #female.px column
+     column.female.px <- 1- mort.table[,2]
+     #Creating a female.px table
+     female.px.table <- cbind(ages,column.female.px)
+     #Creating female.tpx column
+     
+     column.female.tpx <- c(1)
+     for (i in 1:length(column.female.px)){
+       
+       p <- column.female.px[i]
+       t <- column.female.tpx[i]
+       tp <- p*t
+       column.female.tpx <- c(column.female.tpx,tp)
+     }
+     
    }
    
-   
+   # Removing mort.table to trigger errors if gender adjusted tables aren't used below
+   remove("mort.table")
    #Discounting columns
-   v.column <- v^c(1:(length(member.base[,-c(1:3)])))
+   v.column <- v^c(1:(length(member.base[,-c(1:4)])))
    
    #index.converter
-   index.conv <- mort.table[1,1] - 1
+   index.conv <- Male.Mortality.Table[1,1] - 1
+   # I used male here, but the converter is the same for Male and Female
    
    EPV <- c()
    
    for (i in 1:nrow(benefit.base)){
      member.age <- benefit.base[i,2]
+     member.gender <- benefit.base[i,3]
+     
+     if(member.gender==2){
+       px.table <- female.px.table
+       column.tpx <- column.female.tpx
+       column.px <- column.female.px
+     }else{
+       px.table <- male.px.table
+       column.tpx <- column.male.tpx
+       column.px <- column.male.px
+     }
+     
      member.px.part1 <- c(   px.table[-c(1:(member.age - index.conv-1),nrow(px.table)),2] )
      fill.in.years <- (ncol(member.base) - length(member.px.part1))
      member.px.part2 <- rep(0,max(fill.in.years+1,1))
@@ -1032,21 +1082,24 @@ Female.Mortality.Table <- Final.Female.Mort.table
      member.tpx <- c(member.tpx.part1[-length(member.tpx.part1)],member.tpx.part2)
      member.v <- v^c(1:length(member.px))
      
-     member.epv <- sum(member.v * member.px * member.tpx[-length(member.tpx)] * benefit.base[i,4])
+     member.epv <- sum(member.v * member.px * member.tpx[-length(member.tpx)] * benefit.base[i,5])
      
      EPV <- c(EPV, member.epv)
    }
    
    # Let's make a complete EPV data frame for each member
-   EPV <- as.data.frame(cbind(benefit.base[,c(1,2,3)], EPV))
+   EPV <- as.data.frame(cbind(benefit.base[,c(1:4)], EPV))
    
-   Fund <- Original.Fund <- sum(EPV[,4])
-   for(i in 2:(ncol(benefit.base)-3)){
+   Fund <- Original.Fund <- sum(EPV[,5])
+   for(i in 2:(ncol(benefit.base)-4)){
      
      Fund[i] <- Fund[i-1] * (1+interest) - sum(benefit.base[,i+2])
      
      
    }
+   
+   
+   
    }
  }
  
@@ -1054,6 +1107,17 @@ Female.Mortality.Table <- Final.Female.Mort.table
  # benefit.base
  # EPV
  # Fund
+ 
+ 
+ 
+ 
+ 
+ # I have to stress that the mortality rates in the first column is not our
+ # member base's current mortality rate, but rather the 30th column, the cut_off
+ # point in the member base model.
+ 
+ 
+ 
  
  # Now to keep only the main items in the environment
  rm(list = setdiff(ls(), c("Male.Mortality.Table","Female.Mortality.Table","member.base", "benefit.base", "EPV", "Fund")))
