@@ -120,7 +120,12 @@ set.seed(780)
   # in the mean time and just get the model up and running, leaving space
   # for the correct data to be inserted.
   
+  # I will have a variable, called improv.factor (improvement factor),
+  # which will be a value between -100 and 100
+  # A value below 0 causes a worsening mortality rate, and a value above 0 causes a
+  # better mortality rate over time.
   
+  improv.factor <- 10
   
   
   # Here I create the dummy data, which will be called Male.Mort.data
@@ -151,10 +156,39 @@ set.seed(780)
     colnames(Male.Mort.data) <- c("Age", c(2014:2024))
     Male.Mort.data[nrow(Male.Mort.data),] <- c(120, rep(1,11))
   }
+  # Here I create the dummy data, which will be called Female.Mort.data
+  {
+    
+    Female.Mort.data <- as.data.frame(matrix(0, nrow = nrow(Female.Mort.14), ncol = 1))
+    cons.mort <- Female.Mort.14[,2]
+    #Removing seed now
+    #set.seed(780)
+    
+    
+    # Here our dummy data is decreasing at a steady but random rate
+    # I don't really care what the dummy data looks like, since we will
+    # be replacing it with the real thing in due time. However, this is similar
+    # with the assumption in the Lee-Carter model's approach, which I explain below
+    
+    for(i in c(1:11)){
+      
+      rand.improv <- runif(nrow(Female.Mort.data),min = 0, max = 10)/10000000
+      mort.improv <- cons.mort - rand.improv
+      Female.Mort.data <- cbind(Female.Mort.data, mort.improv)
+      cons.mort <- mort.improv
+      
+    }
+    
+    #
+    Female.Mort.data <- cbind(Female.Mort.14[,1], Female.Mort.data[,-1])
+    colnames(Female.Mort.data) <- c("Age", c(2014:2024))
+    Female.Mort.data[nrow(Female.Mort.data),] <- c(120, rep(1,11))
+  }
   
   # With this, I can start constructing the Lee carter model 
   
-  
+  #First I explain the Lee Carter model basics and some assumptions
+  {
   # So basically, the Lee Carter model is ln(m_x,t) = a_x + b_x * k_t
   # a_x is the average mortality for age x
   # b_x is the sensitivity to changes of mortality of age_x to k_x
@@ -186,9 +220,12 @@ set.seed(780)
   # manually overwriting the k_t estimates of the fit before forecasting
   # which is as easy as replacing one column with your own custom column of
   # the same dimensions.
-  
-  # This is whare we determined the parameters of the Lee-Carter Model
-  
+  }
+  # This is where we determined the parameters of the Lee-Carter Model
+  # and forecasted Male Mortality data
+
+  {
+  #This is the parameters being identified
   {
   #First transform the data to only contain the rates:
   mort.rates.data <- as.matrix(Male.Mort.data[,-1])
@@ -243,22 +280,21 @@ set.seed(780)
   kt_hist <- as.numeric(lca_data$kt)
   
   }
+  
+  
   #Now that I have my parameters, and my historical kt's, I can start 
   #forecasting the custom kt's
   
+  # I explain how it is done here
+  {
   # I can either do this manually, or by clever use of manual overriding.
   # Thing is, I can just make a kt model, adjust the drift parameter, and continue
   # using the forecasting function with the adjusted model settings.
   
   # Reason is that to allow the adjustment to be simple enough to control, while
   # not too simple as to make it too unrealistic.
-  
-  # I will have a variable, called improv.factor (improvement factor),
-  # which will be a value between -100 and 100
-  # a value below 0 causes a worsening mortality rate, and a value above 0 causes a
-  # better mortality rate over time.
-  
-  improv.factor <- 10
+  }
+
   
   #Now let's forecast the kt's
   {
@@ -307,52 +343,214 @@ set.seed(780)
   
   # Here I plot a 3D graph to check the data
   {
-    combined <- cbind(Male.Mort.data[-105,-1],mortality.forecast[-105,-1])
-    mat <- as.matrix(-log(combined))
+    #combined <- cbind(Male.Mort.data[-105,-1],mortality.forecast[-105,-1])
+    #mat <- as.matrix(-log(combined))
     
     
     # Load necessary library
-    library(plotly)
+    #library(plotly)
     
     # Create a matrix with values > 1
     
     # Create grid for x and y axes
-    x <- 2014:(2024+ forecast.length)
-    y <- 16:120
+    #x <- 2014:(2024+ forecast.length)
+    #y <- 16:120
     
     
     
     # Plot using plotly
-    plot_ly(
-      x = ~x, y = ~y, z = ~mat,
-      type = "surface"
-    ) %>%
-      layout(
-        title = "3D Surface Plot of Matrix",
-        scene = list(
-          xaxis = list(title = "Columns"),
-          yaxis = list(title = "Rows"),
-          zaxis = list(title = "Values")
-        )
-      )
+    #plot_ly(
+    #  x = ~x, y = ~y, z = ~mat,
+    #  type = "surface"
+    #) %>%
+    #  layout(
+     #   title = "3D Surface Plot of Matrix",
+     #   scene = list(
+     #     xaxis = list(title = "Columns"),
+     #     yaxis = list(title = "Rows"),
+     #     zaxis = list(title = "Values")
+      #  )
+     # )
     
   }
   
   # Now we complete our dummy mortality data by combining the dummy rates
   # and the forecasted rates
   
-  Final.Mort.table <- as.data.frame(cbind(Male.Mort.data, mortality.forecast[,-1]))
+  Final.Male.Mort.table <- as.data.frame(cbind(Male.Mort.data, mortality.forecast[,-1]))
   
   #write.csv(Final.Mort.table, "LC Mortality Data.csv", row.names = FALSE)
+  }
+  
+  # And here I do the same for the Female Mortality Data
+  {
+    #This is the parameters being identified
+    {
+      #First transform the data to only contain the rates:
+      mort.rates.data <- as.matrix(Female.Mort.data[,-1])
+      
+      # Of course, we'll have to decide the forecast length:
+      
+      forecast.length <- nrow(Female.Mort.data) - (ncol(Female.Mort.data)-1)
+      
+      #Now we have to create a model data set that demography can use.
+      # The transformation is done with the demodata function.
+      
+      
+      demo <- demogdata(
+        data =  mort.rates.data,
+        pop = matrix(1000000, ncol = ncol(mort.rates.data), nrow = nrow(mort.rates.data))
+        #Just made up a large population base so that the model can do its thing
+        ,ages = Mort.2014[,1],
+        years = 2014:2024,
+        type = "mortality",
+        label = "YourData",
+        name = "mortality rates"
+      )
+      
+      #Now to fit the parameters of the Lee-Carter model:
+      
+      lca_data <- lca(
+        demo,
+        series = names(demo$rate)[1],
+        ages = demo$age,
+        years = demo$year,
+        max.age = max(demo$age),
+        adjust = "none",
+        chooseperiod = FALSE,
+        minperiod = forecast.length,
+        scale = FALSE,
+        restype = "rates", interpolate = FALSE
+      )
+      
+      
+      
+      # Now we have the parameters of the model, and there is even a function
+      # that can do the forecasting for us, but I want to incorporate my own kt's
+      # to control the mortality improvement.
+      
+      # So first I extract the ax and bx parameters:
+      
+      ax <- as.numeric(lca_data$ax)
+      bx <- as.numeric(lca_data$bx)
+      
+      # To forecast the kt's, I'm going to need the historical kt's too
+      
+      kt_hist <- as.numeric(lca_data$kt)
+      
+    }
+    
+    
+    #Now that I have my parameters, and my historical kt's, I can start 
+    #forecasting the custom kt's
+    
+    # I explain how it is done here
+    {
+      # I can either do this manually, or by clever use of manual overriding.
+      # Thing is, I can just make a kt model, adjust the drift parameter, and continue
+      # using the forecasting function with the adjusted model settings.
+      
+      # Reason is that to allow the adjustment to be simple enough to control, while
+      # not too simple as to make it too unrealistic.
+    }
+    
+    
+    #Now let's forecast the kt's
+    {
+      model <- auto.arima(as.ts(kt_hist),d = 1)
+      drift <- model$coef * (1 + improv.factor/100)
+      sigma2<- model$sigma2
+      set.seed(780)
+      kt_forecast_data <- kt_hist[length(kt_hist)]
+      for(i in 2:(forecast.length+1)) {
+        kt_min1 <- kt_forecast_data[i-1]
+        kt_sim <- drift + kt_min1 + rnorm(1, mean = 0, sd = sqrt(sigma2))
+        kt_forecast_data <- c(kt_forecast_data,kt_sim)
+      }
+      kt_forecast <- as.numeric(kt_forecast_data[-1])
+      #kt_forecast_data <- forecast(model, h = forecast.length)
+      
+      #I used the following code to visually investigate how large the jump is 
+      # between the last historical value and the first forecasted value
+      #y_value <- c(as.numeric(kt_hist)[(length(kt_hist)-3):length((kt_hist))], as.numeric(kt_forecast)[1:4])
+      #x_value <- 1:length(y_value)
+      #plot(x = x_value, y = y_value, type = "s")
+      
+    }
+    
+    # Now I have all the components to forecast my mortality
+    
+    mortality.forecast <- exp(ax + bx %*% t(kt_forecast))
+    
+    #Let's tidy it up:
+    
+    mortality.forecast <- cbind(Mort.2014[,1],mortality.forecast)
+    colnames(mortality.forecast) <- c("Ages",2025:(2024+forecast.length))
+    
+    
+    
+    # To check the data, let's see the mortality rates of different ages, with the historical
+    # and forecasted values combined
+    
+    {
+      #plot((as.numeric(c(Female.Mort.data[(16-15),-1],mortality.forecast[(16-15),-1]))), type = "n",
+      #    ylim = c(min(mortality.forecast[,-1]),0.0007))
+      #lines((as.numeric(c(Female.Mort.data[(16-15),-1],mortality.forecast[(16-15),-1]))), col = "blue")
+      #lines((as.numeric(c(Female.Mort.data[(30-15),-1],mortality.forecast[(30-15),-1]))), col = "red")
+      
+    }
+    
+    # Here I plot a 3D graph to check the data
+    {
+      #combined <- cbind(Female.Mort.data[-105,-1],mortality.forecast[-105,-1])
+      #mat <- as.matrix(-log(combined))
+      
+      
+      # Load necessary library
+      #library(plotly)
+      
+      # Create a matrix with values > 1
+      
+      # Create grid for x and y axes
+      #x <- 2014:(2024+ forecast.length)
+      #y <- 16:120
+      
+      
+      
+      # Plot using plotly
+      #plot_ly(
+      #  x = ~x, y = ~y, z = ~mat,
+      #  type = "surface"
+      #) %>%
+      #  layout(
+      #   title = "3D Surface Plot of Matrix",
+      #   scene = list(
+      #     xaxis = list(title = "Columns"),
+      #     yaxis = list(title = "Rows"),
+      #     zaxis = list(title = "Values")
+      #  )
+      # )
+      
+    }
+    
+    # Now we complete our dummy mortality data by combining the dummy rates
+    # and the forecasted rates
+    
+    Final.Female.Mort.table <- as.data.frame(cbind(Female.Mort.data, mortality.forecast[,-1]))
+    
+    #write.csv(Final.Mort.table, "LC Mortality Data.csv", row.names = FALSE)
+  }
+  
   
 }
 
 # The dummy mortality rates are called Final.Mort.table
 # To link the model above to the model below, we rename Final.Mort.table to 
 # Mortality.Table
-Mortality.Table <- Final.Mort.table
+Male.Mortality.Table <- Final.Male.Mort.table
+Female.Mortality.Table <- Final.Female.Mort.table
 # Run this line below to remove all but Mortality.Table from your environment
- rm(list = setdiff(ls(), "Mortality.Table"))
+ rm(list = setdiff(ls(), c("Male.Mortality.Table","Female.Mortality.Table")))
 
 
 
@@ -618,7 +816,7 @@ Mortality.Table <- Final.Mort.table
  member.base <- member.base[,1:(max(member.base[,3])+4)]
  
 # Run this line below to remove all but Mortality.Table and member.base from your environment
- rm(list = setdiff(ls(), c("Mortality.Table","member.base")))
+ rm(list = setdiff(ls(), c("Male.Mortality.Table","Female.Mortality.Table","member.base")))
  
  
  
@@ -839,7 +1037,7 @@ Mortality.Table <- Final.Mort.table
  # Fund
  
  # Now to keep only the main items in the environment
- rm(list = setdiff(ls(), c("Mortality.Table","member.base", "benefit.base", "EPV", "Fund")))
+ rm(list = setdiff(ls(), c("Male.Mortality.Table","Female.Mortality.Table","member.base", "benefit.base", "EPV", "Fund")))
  # That's it for now
  
  
