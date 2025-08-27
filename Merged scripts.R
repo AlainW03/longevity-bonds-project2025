@@ -301,7 +301,7 @@ set.seed(780)
     model <- auto.arima(as.ts(kt_hist),d = 1)
     drift <- model$coef * (1 + improv.factor/100)
     sigma2<- model$sigma2
-    set.seed(780)
+    #set.seed(780)
     kt_forecast_data <- kt_hist[length(kt_hist)]
     for(i in 2:(forecast.length+1)) {
       kt_min1 <- kt_forecast_data[i-1]
@@ -460,7 +460,7 @@ set.seed(780)
       model <- auto.arima(as.ts(kt_hist),d = 1)
       drift <- model$coef * (1 + improv.factor/100)
       sigma2<- model$sigma2
-      set.seed(780)
+      #set.seed(780)
       kt_forecast_data <- kt_hist[length(kt_hist)]
       for(i in 2:(forecast.length+1)) {
         kt_min1 <- kt_forecast_data[i-1]
@@ -563,7 +563,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
 
 #///////////////////////////////////////////////////////////////////////////////
   #Setting number of members at time 0
-  num.members <- 3
+  num.members <- 10
   # This is where we mainly control the size of this script, hence I moved it here
 #//////////////////////////////////////////////////////////////////////////////
 
@@ -1092,13 +1092,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
    # Let's make a complete EPV data frame for each member
    EPV <- as.data.frame(cbind(benefit.base[,c(1:4)], EPV))
    
-   Fund <- Original.Fund <- sum(EPV[,5])
-   for(i in 2:(ncol(benefit.base)-4)){
-     
-     Fund[i] <- Fund[i-1] * (1+interest) - sum(benefit.base[,i+2])
-     
-     
-   }
+
    
    
    
@@ -1119,7 +1113,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","member.base", 
                            "benefit.base", 
                            "EPV", 
-                           "Fund")))
+                           "interest")))
 
  
  
@@ -1230,6 +1224,13 @@ Female.Mortality.Table <- Final.Female.Mort.table
  # Thus the proportions used for the coupon calculation is:
  coupon.prop <- male.ratio*male.tpx + female.ratio*female.tpx
  
+ # Now to ensure that the length of the coupon cashflows are equal to the
+ # length of the simulated years. It looks funny since it is being adjusted exactly to the
+ # required length down below
+ 
+ coupon.prop <- if (length(coupon.prop) < (ncol(benefit.base)-4)) c(coupon.prop, rep(0,
+ (ncol(benefit.base)-4) - length(coupon.prop))) else coupon.prop[1:(ncol(benefit.base)-4)]
+ 
  }
  # The important outputs of the model above are:
  #coupon.prop
@@ -1238,18 +1239,28 @@ Female.Mortality.Table <- Final.Female.Mort.table
  rm(list = setdiff(ls(), c("cut_off","Male.Mortality.Table",
                            "Female.Mortality.Table","member.base", 
                            "benefit.base", 
-                           "EPV", 
-                           "Fund",
-                           "coupon.prop")))
+                           "EPV",
+                           "coupon.prop", "interest")))
  
 #I assumed "coupon.prop" is the rate that we times by the fixed percentage and is equivalent to lx/l(65)
  
-fixed_percentage <- 0.155 #please change to number appropriate
-notional <- sum(EPV$EPV) #100% OF CURRENT FUNDS --> CORRECT ME IF WRONG
- 
+fixed_percentage <- 0.1425 #please change to number appropriate
+Bond.Prop <- 0.5 # The proportion of the Fund used to purchase the longevity bond
+
+
+Fund <- Original.Fund <- sum(EPV[,5])
+notional <- Fund * Bond.Prop # Bond Value
+Fund <- Fund - notional
 longevity_bonds_cashflows <- fixed_percentage*notional*coupon.prop
 
-discount_rate <- 0.03 #just put something in to work for now 
+for(i in 2:(ncol(benefit.base)-4)){
+  
+  Fund[i] <- Fund[i-1] * (1+interest) - sum(benefit.base[,i+2])*12 + longevity_bonds_cashflows[i-1]
+  
+  
+}
+
+discount_rate <- interest #just put something in to work for now 
 years <- seq_along(longevity_bonds_cashflows)
 discount_factors <- 1 / ((1 + discount_rate)^years)
 PV_longevity_bond <- sum(longevity_bonds_cashflows * discount_factors)
