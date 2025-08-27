@@ -525,7 +525,7 @@ for(Model_Simulation in 1:sim) {
     #Let's tidy it up:
     
     mortality.forecast <- cbind(Mort.2014[,1],mortality.forecast)
-    colnames(mortality.forecast) <- c("Ages",2025:(2024+forecast.length))
+    colnames(mortality.forecast) <- c("Ages",2025:(2024+ncol(mortality.forecast)-1))
     
     
     
@@ -590,7 +590,7 @@ for(Model_Simulation in 1:sim) {
 Male.Mortality.Table <- Final.Male.Mort.table
 Female.Mortality.Table <- Final.Female.Mort.table
 # Run this line below to remove all but Mortality.Table from your environment
- rm(list = setdiff(ls(), c("Male.Mortality.Table","Female.Mortality.Table")))
+ rm(list = setdiff(ls(), c("Male.Mortality.Table","Female.Mortality.Table", "loss", "ruin")))
 
 
 
@@ -603,7 +603,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
 
 #///////////////////////////////////////////////////////////////////////////////
   #Setting number of members at time 0
-  num.members <- 10
+  num.members <- 20
   # This is where we mainly control the size of this script, hence I moved it here
 #//////////////////////////////////////////////////////////////////////////////
 
@@ -883,7 +883,8 @@ Female.Mortality.Table <- Final.Female.Mort.table
  #cut_off needs to be retained for the next model
  
 # Run this line below to remove all but Mortality.Table and member.base from your environment
- rm(list = setdiff(ls(), c( "cut_off","Male.Mortality.Table","Female.Mortality.Table","member.base")))
+ rm(list = setdiff(ls(), c( "cut_off","Male.Mortality.Table","Female.Mortality.Table",
+                            "member.base","loss", "ruin")))
  
  
  
@@ -1153,7 +1154,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","member.base", 
                            "benefit.base", 
                            "EPV", 
-                           "interest")))
+                           "interest","loss", "ruin")))
 
  
  
@@ -1280,7 +1281,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","member.base", 
                            "benefit.base", 
                            "EPV",
-                           "coupon.prop", "interest")))
+                           "coupon.prop", "interest", "loss", "ruin")))
  
 #I assumed "coupon.prop" is the rate that we times by the fixed percentage and is equivalent to lx/l(65)
  
