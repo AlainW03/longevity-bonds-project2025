@@ -47,7 +47,7 @@ for(l in 1:sim) {
   
 }
 
-# And now for the VAR@85% conf and Prob of Ruin calculation
+# And now for the VAR@95% conf and Prob of Ruin calculation
 
 VAR <- as.numeric(quantile(loss, prob = 0.95))
 Prob.of.ruin <- mean(ruin)
