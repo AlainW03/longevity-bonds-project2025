@@ -125,7 +125,7 @@ set.seed(780)
   # A value below 0 causes a worsening mortality rate, and a value above 0 causes a
   # better mortality rate over time.
   
-  improv.factor <- 10
+  improv.factor <- 0
   
   
   # Here I create the dummy data, which will be called Male.Mort.data
@@ -563,7 +563,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
 
 #///////////////////////////////////////////////////////////////////////////////
   #Setting number of members at time 0
-  num.members <- 10
+  num.members <- 3
   # This is where we mainly control the size of this script, hence I moved it here
 #//////////////////////////////////////////////////////////////////////////////
 
@@ -997,12 +997,13 @@ Female.Mortality.Table <- Final.Female.Mort.table
    benefit.base <- benefit.base[,- ncol(benefit.base)]
    
    #Also adding a risk margin for lower than expected mortality
-   risk.margin <- 10
+   risk.margin <- 0
    
    #Pulling and adjusting relevant  Male mortality table
    {
-     mort.table <- Male.Mortality.Table[,c(1,cut_off)]
+     mort.table <- Male.Mortality.Table[,c(1,cut_off+1)]
      mort.table <- cbind(mort.table[,1], mort.table[,2]*(1- risk.margin/100))
+     mort.table[nrow(mort.table),2] <- 1
      colnames(mort.table) <- c("Ages", "qx")
      #Pulling ages for table construction
      ages <- mort.table[,1]
@@ -1024,9 +1025,10 @@ Female.Mortality.Table <- Final.Female.Mort.table
    }
    #Pulling and adjusting relevant  Female mortality table
    {
-     mort.table <- Female.Mortality.Table[,c(1,cut_off)]
+     mort.table <- Female.Mortality.Table[,c(1,cut_off+1)]
      mort.table <- cbind(mort.table[,1], mort.table[,2]*(1- risk.margin/100))
      colnames(mort.table) <- c("Ages", "qx")
+     mort.table[nrow(mort.table),2] <- 1
      #Pulling ages for table construction
      ages <- mort.table[,1]
      #female.px column
@@ -1077,12 +1079,12 @@ Female.Mortality.Table <- Final.Female.Mort.table
      member.px <- c(member.px.part1,member.px.part2)
      
      
-     member.tpx.part1 <- c((column.tpx[-c(1:(member.age - index.conv-1))]))/column.tpx[(member.age - index.conv-1)]
+     member.tpx.part1 <- c((column.tpx[-c(1:(member.age - index.conv-1))]))/column.tpx[(member.age - index.conv)]
      member.tpx.part2 <- rep(0,max(fill.in.years+1,1))
      member.tpx <- c(member.tpx.part1[-length(member.tpx.part1)],member.tpx.part2)
      member.v <- v^c(1:length(member.px))
      
-     member.epv <- sum(member.v * member.px * member.tpx[-length(member.tpx)] * benefit.base[i,5])
+     member.epv <- sum(member.v * member.px * member.tpx[-length(member.tpx)] * level_of_benefit*12)
      
      EPV <- c(EPV, member.epv)
    }
