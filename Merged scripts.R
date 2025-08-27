@@ -1330,3 +1330,19 @@ ruin <- c(ruin, ifelse(Fund[length(Fund)] <= 0,1,0))
 VAR <- as.numeric(quantile(loss, prob = 0.95))
 Prob.of.ruin <- mean(ruin)
 
+# Final outputs of the model are:
+
+rm(list = setdiff(ls(), c("cut_off","Male.Mortality.Table",
+                          "Female.Mortality.Table","member.base", 
+                          "benefit.base", 
+                          "EPV",
+                          "coupon.prop", "interest", "loss", "ruin",
+                          "Bond.Prop",
+                          "fixed_percentage",
+                          "Fund",
+                          "longevity_bonds_cashflows",
+                          "notional",
+                          "Original.Fund",
+                          "Prob.of.ruin",
+                          "PV_longevity_bond",
+                          "VAR")))
