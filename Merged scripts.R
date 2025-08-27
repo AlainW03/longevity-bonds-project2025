@@ -34,6 +34,46 @@
 
 set.seed(780)
 
+
+# This is the part where we integrate the first half of the VAR and Prob of Ruin
+
+# So to calculate the VAR and Prob of ruin, there is actually a very simple
+# approach.
+
+# Explaining approach
+{
+  # VAR
+  # The VAR will be calculated on the 95% percentile of all the 
+  # possible losses the fund has made.
+  
+  # The loss of one simulation is the difference between the 
+  # initial fund value, and the final fund value.
+  
+  # So what we need is a vector that records all the losses of the fund
+  # and the 95% highest loss will be our VAR.
+  
+  
+  # Prob of ruin
+  # This is even easier. "Ruin" is if the fund decreases to a value below 0
+  # in each simulation. That means we only need a vector of 1's and 0's
+  # that records if the final fund value is below 0.
+  
+}
+
+# Creating empty loss and ruin vectors
+loss <- c()
+ruin <- c()
+
+# Parameter controlling the amount of simulations
+
+sim <- 10
+
+# Creating loop to run multiple simulations
+
+for(Model_Simulation in 1:sim) {
+  
+
+
 #Second, we need our mortality table and Lee - Carter Model
 
 {
@@ -1247,7 +1287,8 @@ Female.Mortality.Table <- Final.Female.Mort.table
 fixed_percentage <- 0.1425 #please change to number appropriate
 Bond.Prop <- 0.5 # The proportion of the Fund used to purchase the longevity bond
 
-
+# Now to simulate the Fund
+{
 Fund <- Original.Fund <- sum(EPV[,5])
 notional <- Fund * Bond.Prop # Bond Value
 Fund <- Fund - notional
@@ -1264,3 +1305,27 @@ discount_rate <- interest #just put something in to work for now
 years <- seq_along(longevity_bonds_cashflows)
 discount_factors <- 1 / ((1 + discount_rate)^years)
 PV_longevity_bond <- sum(longevity_bonds_cashflows * discount_factors)
+}
+
+
+
+
+
+#/////////////////////////////////////////////////////////////////////////////
+
+
+# Finally over here we add the second half of the VAR and Prob of ruin code
+
+
+
+# Recording ruin and loss for the l th simulation
+loss <- c(loss, Original.Fund - Fund[length(Fund)])
+ruin <- c(ruin, ifelse(Fund[length(Fund)] <= 0,1,0))
+
+}
+
+# And now for the VAR@95% conf and Prob of Ruin calculation
+
+VAR <- as.numeric(quantile(loss, prob = 0.95))
+Prob.of.ruin <- mean(ruin)
+
