@@ -29,7 +29,7 @@
 library(readxl)
 member.base <- read.csv("Generated State of Life Member Base.csv")
 # I don't like the X's in front of the years, so I'm removing them like this:
-colnames(member.base) <- c(colnames(member.base[,1:3]), 2014:(2014 + length(colnames(member.base))-4))
+colnames(member.base) <- c(colnames(member.base[,1:3]), 2014:(2014 + ncol(member.base)-4))
 # Of course, check whether the first year is actually 2014 first
 
 #Also, the member base is excessively long, let's trim it down
@@ -96,7 +96,6 @@ benefit.base <- t(increase_vec * t(level_of_benefit*member.base[,-c(1:3)]))
 benefit.base <- as.data.frame(cbind(member.base[,1:3], benefit.base))
 
 
-
 #-------------------------------------------------------------------------------
 #Calculating the EPV
 #-------------------------------------------------------------------------------
@@ -111,20 +110,28 @@ library(tidyr)
 # =========================
 # Inputs you control
 # =========================
-i <- 0.05          # annual effective discount rate
-j <- 0.03          # annual escalation rate
+i <- 0.07          # annual effective discount rate
+j <- 0.04          # annual escalation rate
 monthly_payment <- 1000
-terminal_age <- 120
+terminal_age <- 120 # This age is not necessarily guaranteed, please be careful
 
 # =========================
 # 1) Prepare mortality table: keep only Age and 2014, rename to qx, build px
 # =========================
-mortality2014 <- Mortality.Table %>%
-  select(Age, `2014`) %>%
-  rename(qx = `2014`) %>%
-  arrange(Age) %>%
-  filter(Age <= terminal_age)
+{
+#mortality2014 <- Mortality.Table %>%
+#  select(Age, `X2043`) %>% # Wrong column, and column name. Changed "2014" to "X2043"
+#  rename(qx = `X2043`) %>% # Wrong column, and column name. Changed "2014" to "X2043"
+# arrange(Age) %>%
+# filter(Age <= terminal_age)
 
+# Here is a much shorter code:
+mortality2014 <- Mortality.Table[,c(1,31)]
+colnames(mortality2014) <- c("Age","qx")
+} #From what I can tell, this pulls the qx's of our current members
+
+
+{
 # force qx = 1 at terminal age, so the process ends
 if (!any(mortality2014$Age == terminal_age)) {
   mortality2014 <- bind_rows(mortality2014, tibble(Age = terminal_age, qx = 1))
@@ -139,19 +146,32 @@ mortality2014 <- mortality2014 %>%
 # sanity: ages must be consecutive integers
 stopifnot(all(diff(mortality2014$Age) == 1))
 
+} # This code is unnecessary, the mortality table is by design made to
+# give the the exact output this piece of code is trying to enforce
+
+
+
+
 # =========================
 # 2) Prepare member base: select the id and the age only
 #    Adjust the column names here if yours differ
 # =========================
+{
 members <- final.member.base %>%
   transmute(Member = Member, StartAge = Age) %>%   # change if your id column has a different name
   mutate(StartAge = as.integer(StartAge))
+}
+
+# This code does the exact same thing ??
+members <- final.member.base[,c(1,2)]
+colnames(members) <- c("Member", "StartAge")
+
 
 # =========================
 # 3) Survival paths by starting age used in the book
 #    We compute once per StartAge to avoid unnecessary rows
 # =========================
-unique_start_ages <- sort(unique(members$StartAge))
+unique_start_ages <- sort(unique(members$StartAge))  # Why?
 
 survival_by_age <- map_dfr(unique_start_ages, function(x){
   mt <- mortality2014 %>% filter(Age >= x)
@@ -196,6 +216,8 @@ annuity_factors <- tibble(
   a_immediate  = as.numeric(a_immediate)
 ) %>%
   filter(StartAge %in% unique_start_ages)
+
+# Redundant code above, though may be useful at a later stage
 
 # =========================
 # 5) EPV per member for monthly 1 000 with annual escalation j
