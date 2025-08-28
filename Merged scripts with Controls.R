@@ -1292,7 +1292,7 @@ Bond.Prop <- Bond.Proportion # The proportion of the Fund used to purchase the l
 # Now to simulate the Fund
 {
 Fund <- sum(EPV[,5])
-
+Ooriginal.Fund <- Fund
 Original.Fund <- c(Original.Fund, Fund)
 
 notional <- Fund * Bond.Prop # Bond Value
@@ -1324,7 +1324,7 @@ PV_longevity_bond <- sum(longevity_bonds_cashflows * discount_factors)
 
 
 # Recording ruin and loss for the l th simulation
-loss <- c(loss, Original.Fund - Fund[length(Fund)])
+loss <- c(loss, Ooriginal.Fund - Fund[length(Fund)])
 ruin <- c(ruin, ifelse(Fund[length(Fund)] <= 0,1,0))
 
 }
