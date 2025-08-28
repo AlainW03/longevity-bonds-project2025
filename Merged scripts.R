@@ -366,8 +366,7 @@ for(Model_Simulation in 1:sim) {
   #Let's tidy it up:
   
   mortality.forecast <- cbind(Mort.2014[,1],mortality.forecast)
-  colnames(mortality.forecast) <- c("Ages",2025:(2024+forecast.length))
-    
+  colnames(mortality.forecast) <- c("Ages",2025:(2024+ncol(mortality.forecast)-1))    
     
   
   # To check the data, let's see the mortality rates of different ages, with the historical
