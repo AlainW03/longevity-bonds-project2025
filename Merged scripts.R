@@ -1037,7 +1037,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
    benefit.base <- benefit.base[,- ncol(benefit.base)]
    
    #Also adding a risk margin for lower than expected mortality
-   risk.margin <- 5
+   risk.margin <- 10
    
    #Pulling and adjusting relevant  Male mortality table
    {
