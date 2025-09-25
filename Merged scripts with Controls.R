@@ -390,7 +390,7 @@ for(Model_Simulation in 1:sim) {
       
       # To forecast the kt's, I'm going to need the historical kt's too
       
-      kt_hist <- as.numeric(lca_data$kt)*-1
+      kt_hist <- as.numeric(lca_data$kt)
       
     }
     
