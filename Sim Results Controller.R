@@ -1,10 +1,10 @@
 
 
-simulations <- 1000
+simulations <- 10
 Bond.Proportion <- 0
 improvement.factor <- 0
 coupon.rate <- 0.1425
-inital.members <- 100
+inital.members <- 15
 Original.Fund <- c()
 
 system.time(source("Merged scripts with Controls.R"))
