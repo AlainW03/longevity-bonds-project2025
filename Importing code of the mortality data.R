@@ -18,10 +18,69 @@ colnames(Female_deaths_Ann) <- c("Age", 2013:2020)
 Base_Male_Mort_qx <- read_xlsx("CMI Mort Data.xlsx", sheet = "M Base qx")
 Base_Female_Mort_qx <- read_xlsx("CMI Mort Data.xlsx", sheet = "F Base qx")
 
-#The annuitant data only extends to 2020, so I'll be limiting the data to 2020 i/o 2023
-Base_Male_Mort_qx <- Base_Male_Mort_qx[,1:(ncol(Base_Male_Mort_qx)-3)]
-Base_Female_Mort_qx <- Base_Female_Mort_qx[,1:(ncol(Base_Female_Mort_qx)-3)]
+#The annuitant data only includes year 2013 to 2020, but the base mortality
+# extends from 1981 to 2023, so I'll be limiting the data to that range
+
+#First extracting the age column
+age_male_col <- Base_Male_Mort_qx[,1]
+age_female_col <- Base_Female_Mort_qx[,1]
+
+#Temporarily removing the age colum
+Base_Male_Mort_qx <- Base_Male_Mort_qx[,-c(1)]
+Base_Female_Mort_qx <- Base_Female_Mort_qx[,-c(1)]
+
+#Now limiting the year range while putting the age column back in:
+Base_Male_Mort_qx <- cbind(age_male_col, Base_Male_Mort_qx[,-c((1981:2012)-1980, (2021:2023)-1980)])
+Base_Female_Mort_qx <- cbind(age_female_col,Base_Female_Mort_qx[,-c((1981:2012)-1980, (2021:2023)-1980)])
 
 #Correcting the base mortality's column names
-colnames(Base_Male_Mort_qx) <- c("Age", 1981:2020)
-colnames(Base_Female_Mort_qx) <- c("Age", 1981:2020)
+colnames(Base_Male_Mort_qx) <- c("Age", 2013:2020)
+colnames(Base_Female_Mort_qx) <- c("Age", 2013:2020)
+
+
+# Now to construct the mortality tables
+
+
+  # Explaining the structure of the stitched mortality table
+  {# So the Mortality tables are going to be a bit of a Frankenstein's monster
+    
+    # For the male mortality data, age 16 - 54 is going to be base mortality data,
+    # and for the female mortality data it will be ages 16 - 58
+    
+    # The reason is that the mortality data for the annuitants in those age ranges
+    # are all lumped in together, but our lag period depends on those younger ages
+    
+    # So this mortality table and the model is designed such that, even though
+    # the mortality at the linkage is discontinuous, only the younger range
+    # will be used for the lag period, while the older range will be focused 
+    # on the actual simulated cashflows.
+    
+    # The older range used in the lag period is deemed to be acceptable
+    # since the purpose of the lag period is to set the shape of the age distribution
+    # of the member base, which is ultimately dominated by the older age range.
+  }
+  
+  # Extracting the mortality data for the younger male mortality
+  Base_younger_male_mort_qx <- Base_Male_Mort_qx[c((16:54)-15),]
+  # Extracting the mortality data for the younger female mortality
+  Base_younger_female_mort_qx <- Base_Female_Mort_qx[c((16:58)-15),]
+  
+  # Now creating the Annuitant Mortality tables
+  
+  Hist_male_mort_ann <- 1 - exp(-Male_deaths_Ann[,-c(1)] /Male_exposure_Ann[,-c(1)])
+  Hist_male_mort_ann <- cbind(c(55:100), Hist_male_mort_ann)
+  colnames(Hist_male_mort_ann) <- c("Age", 2013:2020)
+  
+  Hist_female_mort_ann <- 1 - exp(-Female_deaths_Ann[,-c(1)] /Female_exposure_Ann[,-c(1)])
+  Hist_female_mort_ann <- cbind(c(55:100), Hist_female_mort_ann)
+  colnames(Hist_female_mort_ann) <- c("Age", 2013:2020)
+  
+  
+  # Now to make our mixed mortality rates
+  
+  Male.Mort.data <- rbind(Base_younger_male_mort_qx,Hist_male_mort_ann)
+  Female.Mort.data <- rbind(Base_younger_female_mort_qx, Hist_female_mort_ann)
+  
+  
+  write.csv(Male.Mort.data, file = "Male_Mort_data.csv", row.names = FALSE)
+  write.csv(Female.Mort.data, file = "Female_Mort_data.csv", row.names = FALSE)
