@@ -95,66 +95,7 @@ for(Model_Simulation in 1:sim) {
   library(forecast)
   
   #/////////////////////////////////////////////////////////////////////////////
-  Mort.2014 <- read_xlsx("CMI Tables Published 2014.xlsx", sheet = 4)
-  #Mort.2014 <- read_excel("Research project code/CMI Tables Published 2014.xlsx", sheet = 4)
-  
-  #Mort.2014 <- read_excel("Research project code/CMI Tables Published 2014.xlsx", sheet = 4, skip =  4) 
-  # ABOVE IS EASY WAY TO CLEAN
-  #////////////////////////////////////////////////////////////////////////////
-  
-  #Ok, that looks nasty, let's clean that up...
-  
-  # I'm creating a function designed to clean the CMI table
-  
-  Clean.CMI.Table <- function(CMI_Table, row_of_col_names){
-    # To avoid confusion, let's rename the table to be cleaned.
-    Table.to.clean <- CMI_Table
-    # Now to extract the column names to be preserved
-    col_names <- colnames(Table.to.clean) <- c(Table.to.clean[row_of_col_names,])
-    # Now to remove all the rows above the row with the column names,
-    # including the column names themselves, so that we are left only with
-    # the data.
-    Table.to.clean <- as.data.frame(Table.to.clean[-c(1:row_of_col_names),])
-    
-    # Great, now, the data is a char for some reason, so as to ensure everything
-    # is numeric, we extract each column into a vector, transform the vector,
-    # and snap it one by one into a data.frame
-    
-    # This table here is created just to have the columns snap on to something
-    Clean.table <- as.data.frame(matrix(0, nrow = nrow(Table.to.clean), ncol = 1))
-    
-    # Looping through each column, transforming them into numerics
-    for(i in 1:ncol(Table.to.clean)) {
-      
-      Extracted_column <- Table.to.clean[,i]
-      Numeric_column <- as.numeric(Extracted_column)
-      Clean.table <- cbind(Clean.table,Numeric_column)
-      
-      
-    }
-    
-    # Let's remove that first row of 0's
-    Clean.table <- Clean.table[,-c(1)]
-    
-    # And finally attach the original column names
-    colnames(Clean.table) <- col_names
-    
-    return(Clean.table)
-    
-  } # End of Table Cleaning function
-  
-  # The function is ready, and should easily apply to all the CMI mortality
-  # tables we may use.
-  
-  # Let's clean our 2014 CMI Mortality data
-  Mort.2014 <- Clean.CMI.Table(Mort.2014,row_of_col_names = 4)
-  
-  #Ok, now that our CMI table is clean, let's split it up to get the respective 
-  # mortality tables
-  
-  Male.Mort.14 <- Mort.2014[,c(1,6)]
-  Female.Mort.14 <- Mort.2014[,c(1,2)]
-  
+ 
   
   
   #Since I do not have all the data I need to build it, I'll make dummy data
@@ -169,160 +110,29 @@ for(Model_Simulation in 1:sim) {
   improv.factor <- improvement.factor
   
   
-  # Here I create the dummy data, which will be called Male.Mort.data
-  {
-    
-    Male.Mort.data <- as.data.frame(matrix(0, nrow = nrow(Male.Mort.14), ncol = 1))
-    cons.mort <- Male.Mort.14[,2]
-    #Removing seed now
-    #set.seed(780)
-    
+  # Here I used to create the dummy data, which will be called Male.Mort.data
 
-    # Here our dummy data is decreasing at a steady but random rate
-    # I don't really care what the dummy data looks like, since we will
-    # be replacing it with the real thing in due time. However, this is similar
-    # with the assumption in the Lee-Carter model's approach, which I explain below
-    
-    for(i in c(1:11)){
-      
-      rand.improv <- runif(nrow(Male.Mort.data),min = 0, max = 10)/10000000
-      mort.improv <- cons.mort - rand.improv
-      Male.Mort.data <- cbind(Male.Mort.data, mort.improv)
-      cons.mort <- mort.improv
-      
-    }
-    
-    #
-    Male.Mort.data <- cbind(Male.Mort.14[,1], Male.Mort.data[,-1])
-    colnames(Male.Mort.data) <- c("Age", c(2014:2024))
-    Male.Mort.data[nrow(Male.Mort.data),] <- c(120, rep(1,11))
-  }
-  # Here I create the dummy data, which will be called Female.Mort.data
-  {
-    
-    Female.Mort.data <- as.data.frame(matrix(0, nrow = nrow(Female.Mort.14), ncol = 1))
-    cons.mort <- Female.Mort.14[,2]
-    #Removing seed now
-    #set.seed(780)
-    
-    
-    # Here our dummy data is decreasing at a steady but random rate
-    # I don't really care what the dummy data looks like, since we will
-    # be replacing it with the real thing in due time. However, this is similar
-    # with the assumption in the Lee-Carter model's approach, which I explain below
-    
-    for(i in c(1:11)){
-      
-      rand.improv <- runif(nrow(Female.Mort.data),min = 0, max = 10)/10000000
-      mort.improv <- cons.mort - rand.improv
-      Female.Mort.data <- cbind(Female.Mort.data, mort.improv)
-      cons.mort <- mort.improv
-      
-    }
-    
-    #
-    Female.Mort.data <- cbind(Female.Mort.14[,1], Female.Mort.data[,-1])
-    colnames(Female.Mort.data) <- c("Age", c(2014:2024))
-    Female.Mort.data[nrow(Female.Mort.data),] <- c(120, rep(1,11))
-  }
+  # Here I used to create the dummy data, which will be called Female.Mort.data
+
   
   
   #A few months later, I have the actual data, this is how I import them
   # With this, I can start constructing the Lee carter model 
   
   # Importing the mortality data
-  
   {
     library(readxl)
     
-    #Importing the deaths and exposure data of the annuitants in payment 
-    # in self administered pension funds population
-    Male_exposure_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "M L Exposure")
-    Male_deaths_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "M L Deaths")
-    Female_exposure_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "M L Exposure")
-    Female_deaths_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "M L Deaths")
+    Male.mort.data.unclean <- read.csv("Male_Mort_data.csv")
+    Female.mort.data.unclean <- read.csv("Female_Mort_data.csv")
     
-    # Correcting the column names
-    colnames(Male_exposure_Ann) <- c("Age", 2013:2020)
-    colnames(Male_deaths_Ann) <- c("Age", 2013:2020)
-    colnames(Female_exposure_Ann) <- c("Age", 2013:2020)
-    colnames(Female_deaths_Ann) <- c("Age", 2013:2020)
+    colnames(Male.mort.data.unclean) <- c("Age", 2013:2020)
+    colnames(Female.mort.data.unclean) <- c("Age", 2013:2020)
     
-    # Importing the calculated qx base mortality values
-    # Calculated using CMI's dx and lx values over the time periods
-    Base_Male_Mort_qx <- read_xlsx("CMI Mort Data.xlsx", sheet = "M Base qx")
-    Base_Female_Mort_qx <- read_xlsx("CMI Mort Data.xlsx", sheet = "F Base qx")
-    
-    #The annuitant data only includes year 2013 to 2020, but the base mortality
-    # extends from 1981 to 2023, so I'll be limiting the data to that range
-    
-    #First extracting the age column
-    age_male_col <- Base_Male_Mort_qx[,1]
-    age_female_col <- Base_Female_Mort_qx[,1]
-    
-    #Temporarily removing the age colum
-    Base_Male_Mort_qx <- Base_Male_Mort_qx[,-c(1)]
-    Base_Female_Mort_qx <- Base_Female_Mort_qx[,-c(1)]
-    
-    #Now limiting the year range while putting the age column back in:
-    Base_Male_Mort_qx <- cbind(age_male_col, Base_Male_Mort_qx[,-c((1981:2012)-1980, (2021:2023)-1980)])
-    Base_Female_Mort_qx <- cbind(age_female_col,Base_Female_Mort_qx[,-c((1981:2012)-1980, (2021:2023)-1980)])
-    
-    #Correcting the base mortality's column names
-    colnames(Base_Male_Mort_qx) <- c("Age", 2013:2020)
-    colnames(Base_Female_Mort_qx) <- c("Age", 2013:2020)
-    
-    
+  Male.Mort.data <- Male.mort.data.unclean
+  Female.Mort.data <- Female.mort.data.unclean
     
   }
-  
-  
-  # Constructing the mortality tables
-  
-  {
-    # Explaining the structure of the stitched mortality table
-    {# So the Mortality tables are going to be a bit of a Frankenstein's monster
-    
-    # For the male mortality data, age 16 - 54 is going to be base mortality data,
-    # and for the female mortality data it will be ages 16 - 58
-    
-    # The reason is that the mortality data for the annuitants in those age ranges
-    # are all lumped in together, but our lag period depends on those younger ages
-    
-    # So this mortality table and the model is designed such that, even though
-    # the mortality at the linkage is discontinuous, only the younger range
-    # will be used for the lag period, while the older range will be focused 
-    # on the actual simulated cashflows.
-    
-    # The older range used in the lag period is deemed to be acceptable
-    # since the purpose of the lag period is to set the shape of the age distribution
-    # of the member base, which is ultimately dominated by the older age range.
-    }
-    
-    # Extracting the mortality data for the younger male mortality
-    Base_younger_male_mort_qx <- Base_Male_Mort_qx[c((16:54)-15),]
-    # Extracting the mortality data for the younger female mortality
-    Base_younger_female_mort_qx <- Base_Female_Mort_qx[c((16:58)-15),]
-    
-    # Now creating the Annuitant Mortality tables
-    
-    Hist_male_mort_ann <- 1 - exp(-Male_deaths_Ann[,-c(1)] /Male_exposure_Ann[,-c(1)])
-    Hist_male_mort_ann <- cbind(c(55:100), Hist_male_mort_ann)
-    colnames(Hist_male_mort_ann) <- c("Age", 2013:2020)
-    
-    Hist_female_mort_ann <- 1 - exp(-Female_deaths_Ann[,-c(1)] /Female_exposure_Ann[,-c(1)])
-    Hist_female_mort_ann <- cbind(c(55:100), Hist_female_mort_ann)
-    colnames(Hist_female_mort_ann) <- c("Age", 2013:2020)
-    
-    
-    # Now to make our mixed mortality rates
-    
-    Male.Mort.data <- rbind(Base_younger_male_mort_qx,Hist_male_mort_ann)
-    Female.Mort.data <- rbind(Base_younger_female_mort_qx, Hist_female_mort_ann)
-    
-    
-  }
-  
   
   #First I explain the Lee Carter model basics and some assumptions
   {
@@ -381,7 +191,7 @@ for(Model_Simulation in 1:sim) {
     pop = matrix(1000000, ncol = ncol(mort.rates.data), nrow = nrow(mort.rates.data))
     #Just made up a large population base so that the model can do its thing
     ,ages = ages,
-    years = 2013:2020,
+    years = c(2013:2020),
     type = "mortality",
     label = "YourData",
     name = "mortality rates"
@@ -436,8 +246,13 @@ for(Model_Simulation in 1:sim) {
   
   #Now let's forecast the kt's
   {
-    model <- auto.arima(as.ts(kt_hist),d = 1)
-    drift <- model$coef * (1 + improv.factor/100)
+    
+    library(forecast)
+    
+    model <- Arima(c(kt_hist), order = c(0,1,0), include.drift = TRUE)
+    
+    # This gives the drift (mean) parameter
+    drift <- model$coef["drift"] * (1 + improv.factor/100)
     sigma2<- model$sigma2
     #set.seed(780)
     kt_forecast_data <- kt_hist[length(kt_hist)]
@@ -463,7 +278,7 @@ for(Model_Simulation in 1:sim) {
   
   #Let's tidy it up:
   
-  mortality.forecast <- cbind(Mort.2014[,1],mortality.forecast)
+  mortality.forecast <- cbind(ages,mortality.forecast)
   colnames(mortality.forecast) <- c("Ages",2021:(2020+ncol(mortality.forecast)-1))
     
     
@@ -541,7 +356,7 @@ for(Model_Simulation in 1:sim) {
         pop = matrix(1000000, ncol = ncol(mort.rates.data), nrow = nrow(mort.rates.data))
         #Just made up a large population base so that the model can do its thing
         ,ages = ages,
-        years = 2014:2024,
+        years = 2013:2020,
         type = "mortality",
         label = "YourData",
         name = "mortality rates"
@@ -575,7 +390,7 @@ for(Model_Simulation in 1:sim) {
       
       # To forecast the kt's, I'm going to need the historical kt's too
       
-      kt_hist <- as.numeric(lca_data$kt)
+      kt_hist <- as.numeric(lca_data$kt)*-1
       
     }
     
@@ -596,8 +411,12 @@ for(Model_Simulation in 1:sim) {
     
     #Now let's forecast the kt's
     {
-      model <- auto.arima(as.ts(kt_hist),d = 1)
-      drift <- model$coef * (1 + improv.factor/100)
+      library(forecast)
+      
+      model <- Arima(c(kt_hist), order = c(0,1,0), include.drift = TRUE)
+      
+      # This gives the drift (mean) parameter
+      drift <- model$coef["drift"] * (1 + improv.factor/100)
       sigma2<- model$sigma2
       #set.seed(780)
       kt_forecast_data <- kt_hist[length(kt_hist)]
@@ -623,7 +442,7 @@ for(Model_Simulation in 1:sim) {
     
     #Let's tidy it up:
     
-    mortality.forecast <- cbind(Mort.2014[,1],mortality.forecast)
+    mortality.forecast <- cbind(ages,mortality.forecast)
     colnames(mortality.forecast) <- c("Ages",2021:(2020+ncol(mortality.forecast)-1))
     
     
@@ -682,7 +501,9 @@ for(Model_Simulation in 1:sim) {
   
   
 }
-
+Tempxaxis <- as.numeric(colnames(Final.Female.Mort.table[,-1]))
+Tempyaxis <- c(as.numeric(Final.Male.Mort.table[40,-1]))
+  plot(x = Tempxaxis, y = Tempyaxis)
 # The dummy mortality rates are called Final.Mort.table
 # To link the model above to the model below, we rename Final.Mort.table to 
 # Mortality.Table

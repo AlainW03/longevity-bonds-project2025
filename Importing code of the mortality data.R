@@ -4,8 +4,8 @@ library(readxl)
 # in self administered pension funds population
 Male_exposure_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "M L Exposure")
 Male_deaths_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "M L Deaths")
-Female_exposure_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "M L Exposure")
-Female_deaths_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "M L Deaths")
+Female_exposure_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "F L Exposure")
+Female_deaths_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "F L Deaths")
 
 # Correcting the column names
 colnames(Male_exposure_Ann) <- c("Age", 2013:2020)
@@ -72,7 +72,7 @@ colnames(Base_Female_Mort_qx) <- c("Age", 2013:2020)
   colnames(Hist_male_mort_ann) <- c("Age", 2013:2020)
   
   Hist_female_mort_ann <- 1 - exp(-Female_deaths_Ann[,-c(1)] /Female_exposure_Ann[,-c(1)])
-  Hist_female_mort_ann <- cbind(c(55:100), Hist_female_mort_ann)
+  Hist_female_mort_ann <- cbind(c(59:100), Hist_female_mort_ann)
   colnames(Hist_female_mort_ann) <- c("Age", 2013:2020)
   
   
@@ -82,5 +82,5 @@ colnames(Base_Female_Mort_qx) <- c("Age", 2013:2020)
   Female.Mort.data <- rbind(Base_younger_female_mort_qx, Hist_female_mort_ann)
   
   
-  write.csv(Male.Mort.data, file = "Male_Mort_data.csv", row.names = FALSE)
-  write.csv(Female.Mort.data, file = "Female_Mort_data.csv", row.names = FALSE)
+  #write.csv(Male.Mort.data, file = "Male_Mort_data.csv", row.names = FALSE)
+  #write.csv(Female.Mort.data, file = "Female_Mort_data.csv", row.names = FALSE)
