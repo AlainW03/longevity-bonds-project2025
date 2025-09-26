@@ -2,18 +2,23 @@
 # Set the parameters, and run this script at once
 # by pressing Ctrl+Alt+R
 
-simulations <- 20
-Bond.Proportion <- 0.75 #Controls what prop of fund gets invested into a Longevity Bond
+simulations <- 50
+Bond.Proportion <- 0 #Controls what prop of fund gets invested into a Longevity Bond
 improv.factor <- 0 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
 # the greater (smaller) the effect of the trend will be.
 coupon.rate <- 0.12
 # Original coupon rate was set at 0.1425
-inital.members <- 100
+inital.members <- 50
 Original.Fund <- c()
-interest_rate <- 7 # value between 0 and 100
+
+# I think I got confused with the rate of return, and the discount rate
+
+interest <- 7 # value between 0 and 100
 fixed_increase_rate <- 4 # value between 0 and 100
-EPV.mort.risk.margin <- 7 # value between 0 and 100
+rate_for_discounting <- interest # value between 0 and 100
+EPV.mort.risk.margin <- 35 # value between 0 and 100
+Fund <- c()
 
 # Over here I am adding a feature control
 # This feature controls the coupon

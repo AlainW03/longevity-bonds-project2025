@@ -190,9 +190,9 @@ for(Model_Simulation in 1:sim) {
   
   demo <- demogdata(
     data =  mort.rates.data,
-    pop = matrix(1000000, ncol = ncol(mort.rates.data), nrow = nrow(mort.rates.data))
+    pop = matrix(1000000, ncol = ncol(mort.rates.data), nrow = nrow(mort.rates.data)),
     #Just made up a large population base so that the model can do its thing
-    ,ages = ages,
+    ages = ages,
     years = c(2008:2023),
     type = "mortality",
     label = "YourData",
@@ -250,12 +250,16 @@ for(Model_Simulation in 1:sim) {
   {
     
     library(forecast)
-    
+    if(sum(abs(c(kt_hist)))==0) {
+      drift <- 0
+      sigma2 <- 0
+    }else{
     model <- Arima(c(kt_hist), order = c(0,1,0), include.drift = TRUE)
     
     # This gives the drift (mean) parameter
     drift <- model$coef["drift"] * (1 + improv.factor/100)
     sigma2<- model$sigma2
+    }
     #set.seed(780)
     kt_forecast_data <- kt_hist[length(kt_hist)]
     for(i in 2:(forecast.length+1)) {
@@ -415,11 +419,17 @@ for(Model_Simulation in 1:sim) {
     {
       library(forecast)
       
-      model <- Arima(c(kt_hist), order = c(0,1,0), include.drift = TRUE)
-      
-      # This gives the drift (mean) parameter
-      drift <- model$coef["drift"] * (1 + improv.factor/100)
-      sigma2<- model$sigma2
+      library(forecast)
+      if(sum(abs(c(kt_hist)))==0) {
+        drift <- 0
+        sigma2 <- 0
+      }else{
+        model <- Arima(c(kt_hist), order = c(0,1,0), include.drift = TRUE)
+        
+        # This gives the drift (mean) parameter
+        drift <- model$coef["drift"] * (1 + improv.factor/100)
+        sigma2<- model$sigma2
+      }
       #set.seed(780)
       kt_forecast_data <- kt_hist[length(kt_hist)]
       for(i in 2:(forecast.length+1)) {
@@ -513,9 +523,9 @@ Male.Mortality.Table <- Final.Male.Mort.table
 Female.Mortality.Table <- Final.Female.Mort.table
 # Run this line below to remove all but Mortality.Table from your environment
  rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion",
-                           "interest_rate", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund",
+                           "interest", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund",
                            "improv.factor","control","Male.Mortality.Table",
-                           "Female.Mortality.Table", "loss", "ruin")))
+                           "Female.Mortality.Table","rate_for_discounting", "loss", "ruin")))
 
 
 
@@ -808,7 +818,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  #cut_off needs to be retained for the next model
  
 # Run this line below to remove all but Mortality.Table and member.base from your environment
- rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest_rate", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund","improv.factor","control", "cut_off","Male.Mortality.Table","Female.Mortality.Table",
+ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund","improv.factor","control", "cut_off","Male.Mortality.Table","Female.Mortality.Table","rate_for_discounting",
                             "member.base","loss", "ruin")))
  
  
@@ -939,8 +949,8 @@ Female.Mortality.Table <- Final.Female.Mort.table
    #Calculating the EPV and Fund
    {
    # Discount rate 
-   interest <- interest_rate
-   v <- (1+increase/100) / (1 + interest/100)
+   
+   v <- (1+increase/100) / (1 + rate_for_discounting/100)
    
    # Identify the columns with the yearly cashflows
    year.cols <- grep("^\\d{4}$", names(benefit.base))
@@ -1040,7 +1050,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
      }
      
      member.px.part1 <- c(   px.table[-c(1:(member.age - index.conv-1),nrow(px.table)),2] )
-     fill.in.years <- (ncol(member.base) - length(member.px.part1))
+     fill.in.years <- (ncol(member.base) - 4 - length(member.px.part1))
      member.px.part2 <- rep(0,max(fill.in.years+1,1))
      member.px <- c(member.px.part1,member.px.part2)
      
@@ -1075,8 +1085,8 @@ Female.Mortality.Table <- Final.Female.Mort.table
  # point in the member base model.
  
  # Now to keep only the main items in the environment
- rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest_rate", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund","improv.factor","control","cut_off","Male.Mortality.Table",
-                           "Female.Mortality.Table","member.base", 
+ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund","improv.factor","control","cut_off","Male.Mortality.Table",
+                           "Female.Mortality.Table","rate_for_discounting","member.base", 
                            "benefit.base", 
                            "EPV", 
                            "interest","loss", "ruin")))
@@ -1202,8 +1212,8 @@ Female.Mortality.Table <- Final.Female.Mort.table
  #coupon.prop
  
  # Now to keep only the main relevant items in the environment
- rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest_rate", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund","improv.factor","control","cut_off","Male.Mortality.Table",
-                           "Female.Mortality.Table","member.base", 
+ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund","improv.factor","control","cut_off","Male.Mortality.Table",
+                           "Female.Mortality.Table","rate_for_discounting","member.base", 
                            "benefit.base", 
                            "EPV",
                            "coupon.prop", "interest", "loss", "ruin")))
@@ -1230,12 +1240,12 @@ longevity_bonds_cashflows <- fixed_percentage*notional*coupon.prop
 
 for(i in 2:(ncol(benefit.base)-4)){
   
-  Fund[i] <- Fund[i-1] * (1+interest/100) - sum(benefit.base[,i+2]) + longevity_bonds_cashflows[i-1]
+  Fund[i] <- (Fund[i-1]) * (1+interest/100) - sum(benefit.base[,i+2]) + longevity_bonds_cashflows[i-1]
   
   
 }
 
-discount_rate <- interest/100 #just put something in to work for now 
+discount_rate <- rate_for_discounting/100 #just put something in to work for now 
 years <- seq_along(longevity_bonds_cashflows)
 discount_factors <- 1 / ((1 + discount_rate)^years)
 PV_longevity_bond <- sum(longevity_bonds_cashflows * discount_factors)
@@ -1265,8 +1275,8 @@ Prob.of.ruin <- mean(ruin)
 
 # Final outputs of the model are:
 
-rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest_rate", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund","improv.factor","control","cut_off","Male.Mortality.Table",
-                          "Female.Mortality.Table","member.base", 
+rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund","improv.factor","control","cut_off","Male.Mortality.Table",
+                          "Female.Mortality.Table","rate_for_discounting","member.base", 
                           "benefit.base", 
                           "EPV",
                           "coupon.prop", "interest", "loss", "ruin",
@@ -1275,7 +1285,7 @@ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","inte
                           "Fund",
                           "longevity_bonds_cashflows",
                           "notional",
-                          "Original.Fund",
+                          "Original.Fund", "Fund",
                           "Prob.of.ruin",
                           "PV_longevity_bond",
                           "VAR")))
