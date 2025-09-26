@@ -1,5 +1,32 @@
 library(readxl)
 
+
+# So I first worked in Excel, constructing the mortality data that we need
+# For the years prior to 2016, I made sure to use the last available
+# deaths and exposure data for each of those years and adding them as their own
+# columns in the left most side.
+
+#Some of those latest available data have age ranges even shorter than that of
+# the 2013 to 2020 data. In such cases, I used the latest possible data
+# available for the ages that are the difference between the 55 to 100 age
+# range and the shorter age range.
+
+# For example, for men's mortality 2010, the latest available data, in the
+# 2010 to 2017 CMI Mortality experience dataset, only included
+# for age ranges from age 57 to age 100. So the death and exposure (D&E) data for ages
+# 57 to 100 are based on that latest available CMI data, but for ages 55 and 56
+# in 2010, the latest available data is located in the 2009 to 2016. 
+# The same procedures were followed for female mortality data sets with
+# shorter age ranges. So far, 2010 is the only one I've found to 
+# where the latest 2010 D&E data for both males and females datasets had shorter
+# age ranges than latest 2013 D&E data.
+
+# Furthermore, I only included the data from 2008 to 2023. This is to keep
+# the data's range long enough for the results to be significant, but also
+# short enough so that the results are more relevant. It was also around 2008 
+# when the CMI team ramped up to more modern techniques and methods, hence 
+# why the data is more relevant to all the way back in 2008.
+
 #Importing the deaths and exposure data of the annuitants in payment 
 # in self administered pension funds population
 Male_exposure_Ann <- read_xlsx("CMI Mort Data.xlsx", sheet = "M L Exposure")
@@ -58,6 +85,14 @@ colnames(Base_Female_Mort_qx) <- c("Age", 2013:2020)
     # The older range used in the lag period is deemed to be acceptable
     # since the purpose of the lag period is to set the shape of the age distribution
     # of the member base, which is ultimately dominated by the older age range.
+    
+    # The 2013 data of the 2013 to 2020 mortality experience
+    # shows a significant spike in mortality rates for ages 93 to 96. 
+    # This outlier was too significant to leave alone, so we replace those
+    # age's D&E data with that in the 2013 data of the 2012 to 2019 mortality 
+    # experience. Although the spike can still be detected after the replacement,
+    # this smoothed the data over those ages are now within acceptable limits.
+    
   }
   
   # Extracting the mortality data for the younger male mortality
