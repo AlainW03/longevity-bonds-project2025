@@ -501,9 +501,9 @@ for(Model_Simulation in 1:sim) {
   
   
 }
-Tempxaxis <- as.numeric(colnames(Final.Female.Mort.table[,-1]))
-Tempyaxis <- c(as.numeric(Final.Female.Mort.table[40,-1]))
-  plot(x = Tempxaxis, y = Tempyaxis)
+#Tempxaxis <- as.numeric(colnames(Final.Female.Mort.table[,-1]))
+#Tempyaxis <- c(as.numeric(Final.Female.Mort.table[40,-1]))
+#  plot(x = Tempxaxis, y = Tempyaxis, type = "l")
 # The dummy mortality rates are called Final.Mort.table
 # To link the model above to the model below, we rename Final.Mort.table to 
 # Mortality.Table
