@@ -126,8 +126,8 @@ for(Model_Simulation in 1:sim) {
     Male.mort.data.unclean <- read.csv("Male_Mort_data.csv")
     Female.mort.data.unclean <- read.csv("Female_Mort_data.csv")
     
-    colnames(Male.mort.data.unclean) <- c("Age", 2013:2020)
-    colnames(Female.mort.data.unclean) <- c("Age", 2013:2020)
+    colnames(Male.mort.data.unclean) <- c("Age", 2008:2023)
+    colnames(Female.mort.data.unclean) <- c("Age", 2008:2023)
     
   Male.Mort.data <- Male.mort.data.unclean
   Female.Mort.data <- Female.mort.data.unclean
@@ -191,7 +191,7 @@ for(Model_Simulation in 1:sim) {
     pop = matrix(1000000, ncol = ncol(mort.rates.data), nrow = nrow(mort.rates.data))
     #Just made up a large population base so that the model can do its thing
     ,ages = ages,
-    years = c(2013:2020),
+    years = c(2008:2023),
     type = "mortality",
     label = "YourData",
     name = "mortality rates"
@@ -279,7 +279,7 @@ for(Model_Simulation in 1:sim) {
   #Let's tidy it up:
   
   mortality.forecast <- cbind(ages,mortality.forecast)
-  colnames(mortality.forecast) <- c("Ages",2021:(2020+ncol(mortality.forecast)-1))
+  colnames(mortality.forecast) <- c("Ages",2024:(2023+ncol(mortality.forecast)-1))
     
     
   
@@ -356,7 +356,7 @@ for(Model_Simulation in 1:sim) {
         pop = matrix(1000000, ncol = ncol(mort.rates.data), nrow = nrow(mort.rates.data))
         #Just made up a large population base so that the model can do its thing
         ,ages = ages,
-        years = 2013:2020,
+        years = 2008:2023,
         type = "mortality",
         label = "YourData",
         name = "mortality rates"
@@ -443,7 +443,7 @@ for(Model_Simulation in 1:sim) {
     #Let's tidy it up:
     
     mortality.forecast <- cbind(ages,mortality.forecast)
-    colnames(mortality.forecast) <- c("Ages",2021:(2020+ncol(mortality.forecast)-1))
+    colnames(mortality.forecast) <- c("Ages",2024:(2023+ncol(mortality.forecast)-1))
     
     
     
@@ -502,7 +502,7 @@ for(Model_Simulation in 1:sim) {
   
 }
 Tempxaxis <- as.numeric(colnames(Final.Female.Mort.table[,-1]))
-Tempyaxis <- c(as.numeric(Final.Male.Mort.table[40,-1]))
+Tempyaxis <- c(as.numeric(Final.Female.Mort.table[40,-1]))
   plot(x = Tempxaxis, y = Tempyaxis)
 # The dummy mortality rates are called Final.Mort.table
 # To link the model above to the model below, we rename Final.Mort.table to 
