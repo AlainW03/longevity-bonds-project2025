@@ -107,7 +107,9 @@ for(Model_Simulation in 1:sim) {
   # A value below 0 causes a worsening mortality rate, and a value above 0 causes a
   # better mortality rate over time.
   
-  improv.factor <- improvement.factor
+  improv.factor <-   improv.factor # Looks funny cause the variable is already
+  # called improv.factor in the controller sheet, but I wanted to keep this line
+  # here for completeness of the model
   
   
   # Here I used to create the dummy data, which will be called Male.Mort.data
@@ -510,7 +512,10 @@ for(Model_Simulation in 1:sim) {
 Male.Mortality.Table <- Final.Male.Mort.table
 Female.Mortality.Table <- Final.Female.Mort.table
 # Run this line below to remove all but Mortality.Table from your environment
- rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","improvement.factor","coupon.rate","Original.Fund","improv.factor","control","Male.Mortality.Table","Female.Mortality.Table", "loss", "ruin")))
+ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion",
+                           "interest_rate", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund",
+                           "improv.factor","control","Male.Mortality.Table",
+                           "Female.Mortality.Table", "loss", "ruin")))
 
 
 
@@ -803,7 +808,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  #cut_off needs to be retained for the next model
  
 # Run this line below to remove all but Mortality.Table and member.base from your environment
- rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","improvement.factor","coupon.rate","Original.Fund","improv.factor","control", "cut_off","Male.Mortality.Table","Female.Mortality.Table",
+ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest_rate", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund","improv.factor","control", "cut_off","Male.Mortality.Table","Female.Mortality.Table",
                             "member.base","loss", "ruin")))
  
  
@@ -914,7 +919,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
    {
    #Now to generate the vector of benefit increases
    #Set the increase as a value between 0 and 100
-   increase <- 4
+   increase <- fixed_increase_rate
    increase_vec <- c(1)
    for(i in 1:(length(member.base)-5)) {
      increase_vec <- c(increase_vec, (increase_vec[i])*(1+increase/100))
@@ -923,7 +928,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
    
    # Now to generate the benefit values:
    {
-   level_of_benefit <- 1000
+   level_of_benefit <- 12000
    
    benefit.base <- t(increase_vec * t(level_of_benefit*member.base[,-c(1:4)]))
    }
@@ -934,8 +939,8 @@ Female.Mortality.Table <- Final.Female.Mort.table
    #Calculating the EPV and Fund
    {
    # Discount rate 
-   interest <- 0.07
-   v <- (1+increase/100) / (1 + interest)
+   interest <- interest_rate
+   v <- (1+increase/100) / (1 + interest/100)
    
    # Identify the columns with the yearly cashflows
    year.cols <- grep("^\\d{4}$", names(benefit.base))
@@ -958,7 +963,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
    benefit.base <- benefit.base[,- ncol(benefit.base)]
    
    #Also adding a risk margin for lower than expected mortality
-   risk.margin <- 0
+   risk.margin <- EPV.mort.risk.margin
    
    #Pulling and adjusting relevant  Male mortality table
    {
@@ -1045,7 +1050,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
      member.tpx <- c(member.tpx.part1[-length(member.tpx.part1)],member.tpx.part2)
      member.v <- v^c(1:length(member.px))
      
-     member.epv <- sum(member.v * member.px * member.tpx[-length(member.tpx)] * level_of_benefit*12)
+     member.epv <- sum(member.v * member.px * member.tpx[-length(member.tpx)] * level_of_benefit)
      
      EPV <- c(EPV, member.epv)
    }
@@ -1070,7 +1075,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  # point in the member base model.
  
  # Now to keep only the main items in the environment
- rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","improvement.factor","coupon.rate","Original.Fund","improv.factor","control","cut_off","Male.Mortality.Table",
+ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest_rate", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund","improv.factor","control","cut_off","Male.Mortality.Table",
                            "Female.Mortality.Table","member.base", 
                            "benefit.base", 
                            "EPV", 
@@ -1197,35 +1202,40 @@ Female.Mortality.Table <- Final.Female.Mort.table
  #coupon.prop
  
  # Now to keep only the main relevant items in the environment
- rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","improvement.factor","coupon.rate","Original.Fund","improv.factor","control","cut_off","Male.Mortality.Table",
+ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest_rate", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund","improv.factor","control","cut_off","Male.Mortality.Table",
                            "Female.Mortality.Table","member.base", 
                            "benefit.base", 
                            "EPV",
                            "coupon.prop", "interest", "loss", "ruin")))
  
-#I assumed "coupon.prop" is the rate that we times by the fixed percentage and is equivalent to lx/l(65)
- 
-fixed_percentage <- coupon.rate #please change to number appropriate
-Bond.Prop <- Bond.Proportion # The proportion of the Fund used to purchase the longevity bond
+
 
 # Now to simulate the Fund
 {
 Fund <- sum(EPV[,5])
 Ooriginal.Fund <- Fund
 Original.Fund <- c(Original.Fund, Fund)
+#I assumed "coupon.prop" is the rate that we times by the fixed percentage and is equivalent to lx/l(65)
 
+# Here I added the feature of the coupon rate being set as the prop of the first
+# year's liabilities to the total fund
+fixed_percentage <- ifelse(Feature == 1, sum(benefit.base[,4])/Fund, coupon.rate) #please change to number appropriate
+# Recording the coupon rate for later analysis
+coupon.rate <- fixed_percentage
+
+Bond.Prop <- Bond.Proportion # The proportion of the Fund used to purchase the longevity bond
 notional <- Fund * Bond.Prop # Bond Value
 Fund <- Fund - notional
 longevity_bonds_cashflows <- fixed_percentage*notional*coupon.prop
 
 for(i in 2:(ncol(benefit.base)-4)){
   
-  Fund[i] <- Fund[i-1] * (1+interest) - sum(benefit.base[,i+2])*12 + longevity_bonds_cashflows[i-1]
+  Fund[i] <- Fund[i-1] * (1+interest/100) - sum(benefit.base[,i+2]) + longevity_bonds_cashflows[i-1]
   
   
 }
 
-discount_rate <- interest #just put something in to work for now 
+discount_rate <- interest/100 #just put something in to work for now 
 years <- seq_along(longevity_bonds_cashflows)
 discount_factors <- 1 / ((1 + discount_rate)^years)
 PV_longevity_bond <- sum(longevity_bonds_cashflows * discount_factors)
@@ -1255,7 +1265,7 @@ Prob.of.ruin <- mean(ruin)
 
 # Final outputs of the model are:
 
-rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","improvement.factor","coupon.rate","Original.Fund","improv.factor","control","cut_off","Male.Mortality.Table",
+rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest_rate", "fixed_increase_rate","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund","improv.factor","control","cut_off","Male.Mortality.Table",
                           "Female.Mortality.Table","member.base", 
                           "benefit.base", 
                           "EPV",
