@@ -317,10 +317,12 @@ Male_smoothed_data <- Smoothed_mortality
   
   Female_smoothed_data <- Smoothed_mortality
   
+
+  
 }
 
+colnames(Female_smoothed_data) <- c("Age", 2008:2023)
+colnames(Male_smoothed_data) <- c("Age", 2008:2023)
 
-
-
-#write.csv(Male_smoothed_data, file = "Male_Mort_data.csv", row.names = FALSE)
-#write.csv(Female_smoothed_data, file = "Female_Mort_data.csv", row.names = FALSE)
+write.csv(Male_smoothed_data, file = "Male_Mort_data.csv", row.names = FALSE)
+write.csv(Female_smoothed_data, file = "Female_Mort_data.csv", row.names = FALSE)
