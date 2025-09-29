@@ -1240,7 +1240,7 @@ longevity_bonds_cashflows <- fixed_percentage*notional*coupon.prop
 
 for(i in 2:(ncol(benefit.base)-4)){
   
-  Fund[i] <- (Fund[i-1]) * (1+interest/100) - sum(benefit.base[,i+2]) + longevity_bonds_cashflows[i-1]
+  Fund[i] <- (Fund[i-1]) * ifelse(Fund[i-1] > 0, 1, 0) * (1+interest/100) - sum(benefit.base[,i+2]) + longevity_bonds_cashflows[i-1]
   
   
 }

@@ -1,3 +1,5 @@
+library(readxl)
+
 mock_data <- CMI_Mort_Data <- read_excel("CMI Mort Data.xlsx", 
                                          sheet = "S4 Lives qx 2014 to 2019")
 ages <- mock_data[,1]
