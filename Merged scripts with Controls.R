@@ -55,7 +55,7 @@ set.seed(780)
   
   
   # Prob of ruin
-  # This is even easier. "Ruin" is if the fund decreases to a value below 0
+  # This is even easier. "Ruin", is if the fund decreases to a value below 0
   # in each simulation. That means we only need a vector of 1's and 0's
   # that records if the final fund value is below 0.
   
@@ -64,6 +64,7 @@ set.seed(780)
 # Creating empty loss and ruin vectors
 loss <- c()
 ruin <- c()
+
 
 # Parameter controlling the amount of simulations
 
@@ -525,7 +526,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion",
                            "interest", "fixed_increase_rate","reference.population.age","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund",
                            "improv.factor","control","Male.Mortality.Table",
-                           "Female.Mortality.Table","rate_for_discounting", "loss", "ruin")))
+                           "Female.Mortality.Table","rate_for_discounting", "loss","FUND", "ruin")))
 
 
 
@@ -776,7 +777,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
   
   #For curiosity sake, let's look at how the distribution of ages and gender ended up to be:
   {
-  plot(density(as.numeric(final.member.base[,2] )), main = "Density of Final Member Base Ages", xlab = "Ages", xlim = c(60,100))
+  #plot(density(as.numeric(final.member.base[,2] )), main = "Density of Final Member Base Ages", xlab = "Ages", xlim = c(60,100))
   
   #Now let's take a look at the distribution of age of death
   #plot(density(as.numeric(final.member.base[,2] )+as.numeric(final.member.base[,3] )), main = "Density of Final Member Base Death Ages", xlab = "Ages")
@@ -819,7 +820,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  
 # Run this line below to remove all but Mortality.Table and member.base from your environment
  rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest", "fixed_increase_rate","reference.population.age","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund","improv.factor","control", "cut_off","Male.Mortality.Table","Female.Mortality.Table","rate_for_discounting",
-                            "member.base","loss", "ruin")))
+                            "member.base","loss","FUND", "ruin")))
  
  
  
@@ -1089,7 +1090,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","rate_for_discounting","member.base", 
                            "benefit.base", 
                            "EPV", 
-                           "interest","loss", "ruin")))
+                           "interest","loss","FUND", "ruin")))
 
  
  
@@ -1216,7 +1217,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","rate_for_discounting","member.base", 
                            "benefit.base", 
                            "EPV",
-                           "coupon.prop", "interest", "loss", "ruin")))
+                           "coupon.prop", "interest", "loss","FUND", "ruin")))
  
 
 
@@ -1265,6 +1266,8 @@ PV_longevity_bond <- sum(longevity_bonds_cashflows * discount_factors)
 # Recording ruin and loss for the l th simulation
 loss <- c(loss, Ooriginal.Fund - Fund[length(Fund)])
 ruin <- c(ruin, ifelse(Fund[length(Fund)] <= 0,1,0))
+Fund.adj <- c(Fund, rep(0,ncol(FUND)-length(Fund)))
+FUND <- rbind(FUND,Fund.adj)
 
 }
 
@@ -1279,7 +1282,7 @@ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","inte
                           "Female.Mortality.Table","rate_for_discounting","member.base", 
                           "benefit.base", 
                           "EPV",
-                          "coupon.prop", "interest", "loss", "ruin",
+                          "coupon.prop", "interest", "loss","FUND", "ruin",
                           "Bond.Prop",
                           "fixed_percentage",
                           "Fund",
