@@ -55,7 +55,7 @@ set.seed(780)
   
   
   # Prob of ruin
-  # This is even easier. "Ruin", is if the fund decreases to a value below 0
+  # This is even easier. "ruin", is if the fund decreases to a value below 0
   # in each simulation. That means we only need a vector of 1's and 0's
   # that records if the final fund value is below 0.
   

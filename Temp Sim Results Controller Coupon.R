@@ -7,11 +7,12 @@ Bond.Proportion <- 99 #Controls what prop of fund gets invested into a Longevity
 improv.factor <- 0 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
 # the greater (smaller) the effect of the trend will be.
-
-
+results <- c()
+for(i in 1:5) {
+coupon.rate <- 0.12 + i/400
 {
-  # The Prob of Ruin varies between 12% and 0% between
-# a coupon rate of 0.1225 and 0.1275
+  # The Prob of Ruin varies between 50% and 0% between
+# a coupon rate of 0.0428 and 0.047
 # That is with:
 #Bond.Proportion <- 100 #Controls what prop of fund gets invested into a Longevity Bond
 #improv.factor <- 0 
@@ -90,5 +91,8 @@ rownames(result) <- c("Simulations",
                       "Feature active?",
                       "Runtime")
 
+prob.plus.coupon <- c(coupon.rate, Prob.of.ruin)
+results <- cbind(results, prob.plus.coupon)
+}
 View(result)
 #View(FUND)
