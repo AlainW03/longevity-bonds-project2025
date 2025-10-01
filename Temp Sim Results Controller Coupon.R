@@ -3,13 +3,14 @@
 # by pressing Ctrl+Alt+R
 
 simulations <- 150
-Bond.Proportion <- 99 #Controls what prop of fund gets invested into a Longevity Bond
+Bond.Proportion <- 0 #Controls what prop of fund gets invested into a Longevity Bond
 improv.factor <- 0 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
 # the greater (smaller) the effect of the trend will be.
 results <- c()
-for(i in 1:5) {
-coupon.rate <- 0.12 + i/400
+tests <- 3
+for(i in 1:tests) {
+coupon.rate <- 0.125 
 {
   # The Prob of Ruin varies between 50% and 0% between
 # a coupon rate of 0.0428 and 0.047
@@ -23,16 +24,16 @@ coupon.rate <- 0.12 + i/400
 # Original coupon rate was set at 0.1425
 }# Playing with the coupon rate 
 
-inital.members <- 50
+inital.members <- 150
 Original.Fund <- c()
 reference.population.age <- 65
 
 # I think I got confused with the rate of return, and the discount rate
 
-interest <- 7 # value between 0 and 100
+interest <- 0 + i  # value between 0 and 100
 fixed_increase_rate <- 4 # value between 0 and 100
 rate_for_discounting <- interest # value between 0 and 100
-EPV.mort.risk.margin <- 10 # value between 0 and 100
+EPV.mort.risk.margin <- 45 # value between 0 and 100
 Fund <- c()
 {
   # Over here I am adding a feature control
@@ -91,8 +92,8 @@ rownames(result) <- c("Simulations",
                       "Feature active?",
                       "Runtime")
 
-prob.plus.coupon <- c(coupon.rate, Prob.of.ruin)
-results <- cbind(results, prob.plus.coupon)
+prob.plus.interest <- c(interest, Prob.of.ruin)
+results <- cbind(results, prob.plus.interest)
 }
 View(result)
 #View(FUND)

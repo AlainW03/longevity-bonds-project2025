@@ -55,7 +55,7 @@ set.seed(780)
   
   
   # Prob of ruin
-  # This is even easier. "ruin","results", is if the fund decreases to a value below 0
+  # This is even easier. "ruin", is if the fund decreases to a value below 0
   # in each simulation. That means we only need a vector of 1's and 0's
   # that records if the final fund value is below 0.
   
@@ -526,11 +526,11 @@ Female.Mortality.Table <- Final.Female.Mort.table
  rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion",
                            "interest", "fixed_increase_rate","reference.population.age","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund",
                            "improv.factor","control","Male.Mortality.Table",
-                           "Female.Mortality.Table","rate_for_discounting", "loss","FUND", "ruin","results")))
+                           "Female.Mortality.Table","rate_for_discounting", "loss","FUND", "ruin")))
 
 
 
-
+ plot(y = c(Male.Mortality.Table[65,-1]*100), x = seq_along(c(Male.Mortality.Table[65,-1]*100)), type = "l", ylim = c(0,15))
 
 
 
@@ -820,7 +820,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  
 # Run this line below to remove all but Mortality.Table and member.base from your environment
  rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest", "fixed_increase_rate","reference.population.age","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund","improv.factor","control", "cut_off","Male.Mortality.Table","Female.Mortality.Table","rate_for_discounting",
-                            "member.base","loss","FUND", "ruin","results")))
+                            "member.base","loss","FUND", "ruin")))
  
  
  
@@ -1090,7 +1090,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","rate_for_discounting","member.base", 
                            "benefit.base", 
                            "EPV", 
-                           "interest","loss","FUND", "ruin","results")))
+                           "interest","loss","FUND", "ruin")))
 
  
  
@@ -1217,7 +1217,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","rate_for_discounting","member.base", 
                            "benefit.base", 
                            "EPV",
-                           "coupon.prop", "interest", "loss","FUND", "ruin","results")))
+                           "coupon.prop", "interest", "loss","FUND", "ruin")))
  
 
 
@@ -1282,7 +1282,7 @@ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","inte
                           "Female.Mortality.Table","rate_for_discounting","member.base", 
                           "benefit.base", 
                           "EPV",
-                          "coupon.prop", "interest", "loss","FUND", "ruin","results",
+                          "coupon.prop", "interest", "loss","FUND", "ruin",
                           "Bond.Prop",
                           "fixed_percentage",
                           "Fund",

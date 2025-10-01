@@ -3,8 +3,8 @@
 # by pressing Ctrl+Alt+R
 
 simulations <- 100
-Bond.Proportion <- 50 #Controls what prop of fund gets invested into a Longevity Bond
-improv.factor <- 0 # factor that messes with kappa's drift value
+Bond.Proportion <- 0 #Controls what prop of fund gets invested into a Longevity Bond
+improv.factor <- -150 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
 # the greater (smaller) the effect of the trend will be.
 
@@ -22,7 +22,7 @@ coupon.rate <- 12.5 # value between 0 and 100
 # Original coupon rate was set at 0.1425
 }# Playing with the coupon rate 
 
-inital.members <- 50
+inital.members <- 100
 Original.Fund <- c()
 reference.population.age <- 65
 
