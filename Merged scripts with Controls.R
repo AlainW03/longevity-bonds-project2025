@@ -1230,7 +1230,7 @@ Original.Fund <- c(Original.Fund, Fund)
 
 # Here I added the feature of the coupon rate being set as the prop of the first
 # year's liabilities to the total fund
-fixed_percentage <- ifelse(Feature == 1, sum(benefit.base[,4])/Fund, coupon.rate) #please change to number appropriate
+fixed_percentage <- ifelse(Feature == 1, sum(benefit.base[,4])/Fund, coupon.rate/100) #please change to number appropriate
 # Recording the coupon rate for later analysis
 coupon.rate <- fixed_percentage
 

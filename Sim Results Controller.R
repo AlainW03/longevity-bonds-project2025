@@ -8,7 +8,7 @@ improv.factor <- 0 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
 # the greater (smaller) the effect of the trend will be.
 
-
+coupon.rate <- 12.5 # value between 0 and 100
 {
   # The Prob of Ruin varies between 12% and 0% between
 # a coupon rate of 0.1225 and 0.1275
