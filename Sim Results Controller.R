@@ -3,12 +3,12 @@
 # by pressing Ctrl+Alt+R
 
 simulations <- 150
-Bond.Proportion <- 100 #Controls what prop of fund gets invested into a Longevity Bond
+Bond.Proportion <- 99 #Controls what prop of fund gets invested into a Longevity Bond
 improv.factor <- 0 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
 # the greater (smaller) the effect of the trend will be.
 
-coupon.rate <- 0.0475
+coupon.rate <- 0.15
 {
   # The Prob of Ruin varies between 50% and 0% between
 # a coupon rate of 0.0428 and 0.047

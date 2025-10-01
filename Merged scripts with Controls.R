@@ -1234,14 +1234,14 @@ fixed_percentage <- ifelse(Feature == 1, sum(benefit.base[,4])/Fund, coupon.rate
 # Recording the coupon rate for later analysis
 coupon.rate <- fixed_percentage
 
-Bond.Prop <- Bond.Proportion # The proportion of the Fund used to purchase the longevity bond
+Bond.Prop <- Bond.Proportion/100 # The proportion of the Fund used to purchase the longevity bond
 notional <- Fund * Bond.Prop # Bond Value
 Fund <- Fund - notional
 longevity_bonds_cashflows <- fixed_percentage*notional*coupon.prop
 
 for(i in 2:(ncol(benefit.base)-4)){
   
-  Fund[i] <- (Fund[i-1])  * (1+(interest * ifelse(Fund[i-1] > 0, 1, 0)/100)) - sum(benefit.base[,i+2]) + longevity_bonds_cashflows[i-1]
+  Fund[i] <- (Fund[i-1])  * (1+(interest * ifelse(Fund[i-1] > 0, 1, 0)/100)) - sum(benefit.base[,i+3]) + longevity_bonds_cashflows[i-1]
   
   
 }
