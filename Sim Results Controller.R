@@ -49,8 +49,8 @@ time_elapsed <- as.numeric(timing["elapsed"])
 {
   FUND <- FUND[-1,]
   FUND <- FUND[,1: (max(  apply(FUND!= 0,MARGIN = 1,FUN = sum) )) ]
-  colnames(FUND) <- seq_along(FUND[1,])
-  rownames(FUND) <- c(1:(simulations))
+  colnames(FUND) <- paste0("Y",seq_along(FUND[1,]))
+  rownames(FUND) <- paste0("SIM",c(1:(simulations)))
 } #Cleaning up Fund Value monitor
 
 Original.Fund.Avg <- mean(Original.Fund)
