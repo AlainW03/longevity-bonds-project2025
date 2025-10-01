@@ -1230,9 +1230,9 @@ Original.Fund <- c(Original.Fund, Fund)
 
 # Here I added the feature of the coupon rate being set as the prop of the first
 # year's liabilities to the total fund
-fixed_percentage <- ifelse(Feature == 1, sum(benefit.base[,4])/Fund, coupon.rate/100) #please change to number appropriate
+# fixed_percentage <- ifelse(Feature == 1, sum(benefit.base[,4])/Fund, coupon.rate/100) #please change to number appropriate
 # Recording the coupon rate for later analysis
-coupon.rate <- fixed_percentage
+fixed_percentage <- coupon.rate/100
 
 Bond.Prop <- Bond.Proportion/100 # The proportion of the Fund used to purchase the longevity bond
 notional <- Fund * Bond.Prop # Bond Value
