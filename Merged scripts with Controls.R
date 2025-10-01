@@ -1265,7 +1265,7 @@ PV_longevity_bond <- sum(longevity_bonds_cashflows * discount_factors)
 
 # Recording ruin and loss for the l th simulation
 loss <- c(loss, Ooriginal.Fund - Fund[length(Fund)])
-ruin <- c(ruin, ifelse(Fund[length(Fund)] <= 0,1,0))
+ruin <- c(ruin, ifelse(sum(Fund[-1] < 0) > 0,1,0))
 Fund.adj <- c(Fund, rep(0,ncol(FUND)-length(Fund)))
 FUND <- rbind(FUND,Fund.adj)
 

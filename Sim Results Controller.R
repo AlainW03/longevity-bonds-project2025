@@ -2,23 +2,36 @@
 # Set the parameters, and run this script at once
 # by pressing Ctrl+Alt+R
 
-simulations <- 50
+simulations <- 150
 Bond.Proportion <- 100 #Controls what prop of fund gets invested into a Longevity Bond
 improv.factor <- 0 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
 # the greater (smaller) the effect of the trend will be.
-coupon.rate <- 0.08
+
+coupon.rate <- 0.0475
+{
+  # The Prob of Ruin varies between 50% and 0% between
+# a coupon rate of 0.0428 and 0.047
+# That is with:
+#Bond.Proportion <- 100 #Controls what prop of fund gets invested into a Longevity Bond
+#improv.factor <- 0 
+#interest <- 7 
+#fixed_increase_rate <- 4
+#EPV.mort.risk.margin <- 10
+#reference.population.age <- 65
 # Original coupon rate was set at 0.1425
+}# Playing with the coupon rate 
+
 inital.members <- 50
 Original.Fund <- c()
 reference.population.age <- 65
 
 # I think I got confused with the rate of return, and the discount rate
 
-interest <- 10 # value between 0 and 100
+interest <- 7 # value between 0 and 100
 fixed_increase_rate <- 4 # value between 0 and 100
 rate_for_discounting <- interest # value between 0 and 100
-EPV.mort.risk.margin <- 16 # value between 0 and 100
+EPV.mort.risk.margin <- 10 # value between 0 and 100
 Fund <- c()
 {
   # Over here I am adding a feature control
@@ -56,25 +69,25 @@ time_elapsed <- as.numeric(timing["elapsed"])
 Original.Fund.Avg <- mean(Original.Fund)
 result <- as.data.frame(rbind(round(simulations,digits = 0),
                               round(inital.members,digits = 0),
-                              Prob.of.ruin,
+                              round(Prob.of.ruin*100, digits = 3),
                               round(VAR,digits = 3),
                               round((100*VAR/Original.Fund.Avg),digits = 3),
                               Bond.Proportion,
                               improv.factor,
-                              coupon.rate,
+                              coupon.rate*100,
                               ifelse(Feature==1, "Yes","No"),
                               round(time_elapsed,digits = 3)))
 
 colnames(result) <- "Results"
 rownames(result) <- c("Simulations",
                       "Initial Nr of Members",
-                      "Prob of Ruin",
+                      "Prob of Ruin %",
                       "VAR @ 95%",
                       "VAR as % of Original Fund",
                       "Prop invested in Bond",
                       "Mort Improvement Factor",
-                      "Coupon Rate",
+                      "Coupon Rate %",
                       "Feature active?",
                       "Runtime")
 View(result)
-View(FUND)
+#View(FUND)
