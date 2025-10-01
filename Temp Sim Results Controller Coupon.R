@@ -2,13 +2,13 @@
 # Set the parameters, and run this script at once
 # by pressing Ctrl+Alt+R
 
-simulations <- 150
+simulations <- 10
 Bond.Proportion <- 0 #Controls what prop of fund gets invested into a Longevity Bond
 improv.factor <- 0 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
 # the greater (smaller) the effect of the trend will be.
 results <- c()
-tests <- 3
+tests <- 1
 for(i in 1:tests) {
 coupon.rate <- 0.125 
 {
@@ -24,16 +24,21 @@ coupon.rate <- 0.125
 # Original coupon rate was set at 0.1425
 }# Playing with the coupon rate 
 
-inital.members <- 150
+inital.members <- 1000
 Original.Fund <- c()
 reference.population.age <- 65
 
 # I think I got confused with the rate of return, and the discount rate
 
-interest <- 0 + i  # value between 0 and 100
+interest <- 22  # value between 0 and 100, sweetspot is around 22
+# select mortality risk is reflected in the interest rate. Since, say you have
+# 1000 members, then your select mortality risk is small. You'll see that your i
+# can be anything and it will barely have an affect with 1000 members (PoR of 50%)
 fixed_increase_rate <- 4 # value between 0 and 100
 rate_for_discounting <- interest # value between 0 and 100
-EPV.mort.risk.margin <- 45 # value between 0 and 100
+EPV.mort.risk.margin <- 45# value between 0 and 100, allows for trend in EPV
+# 45 is the best estimate, with a 50% PoR with 1000 members (which theoretically 
+#restricts select risk)
 Fund <- c()
 {
   # Over here I am adding a feature control
