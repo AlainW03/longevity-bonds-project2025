@@ -776,7 +776,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
   
   #For curiosity sake, let's look at how the distribution of ages and gender ended up to be:
   {
-  plot(density(as.numeric(final.member.base[,2] )), main = "Density of Final Member Base Ages", xlab = "Ages", xlim = c(60,100))
+  #plot(density(as.numeric(final.member.base[,2] )), main = "Density of Final Member Base Ages", xlab = "Ages", xlim = c(60,100))
   
   #Now let's take a look at the distribution of age of death
   #plot(density(as.numeric(final.member.base[,2] )+as.numeric(final.member.base[,3] )), main = "Density of Final Member Base Death Ages", xlab = "Ages")

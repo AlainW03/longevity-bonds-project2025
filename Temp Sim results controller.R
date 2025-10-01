@@ -20,7 +20,7 @@ fixed_increase_rate <- 4 # value between 0 and 100
 rate_for_discounting <- interest # value between 0 and 100
 EPV.mort.risk.margin <- 16 # value between 0 and 100
 Fund <- c()
-
+{
 # Over here I am adding a feature control
 # This feature controls the coupon
 # If the feature is 1, then the script will ignore the 
@@ -28,14 +28,31 @@ Fund <- c()
 # the first year's liabilities are to the total fund.
 
 Feature <- 0
-
-# The feature was useless, since the first year's liabilities were so
+  # The feature was useless, since the first year's liabilities were so
 # small compared to the original fund, the coupon was lower than 0.1% EVERY TIME!
+} # This is the useless feature
+
+# Creating Fund value monitor
+{
+  Total.columns <- 70
+  
+  FUND <- as.data.frame(matrix(0,ncol = Total.columns))
+  
+  
+  
+}
 
 
 timing <- system.time(source("Merged scripts with Controls.R"))
 
 time_elapsed <- as.numeric(timing["elapsed"])
+
+{
+FUND <- FUND[-1,]
+FUND <- FUND[,1: (max(  apply(FUND!= 0,MARGIN = 1,FUN = sum) )) ]
+colnames(FUND) <- seq_along(FUND[1,])
+rownames(FUND) <- c(1:(simulations))
+} #Cleaning up Fund Value monitor
 
 Original.Fund.Avg <- mean(Original.Fund)
 result <- as.data.frame(rbind(round(simulations,digits = 0),
@@ -61,3 +78,4 @@ rownames(result) <- c("Simulations",
                       "Feature active?",
                       "Runtime")
 View(result)
+View(FUND)
