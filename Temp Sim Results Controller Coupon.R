@@ -10,7 +10,7 @@ improv.factor <- 0 # factor that messes with kappa's drift value
 results <- c()
 tests <- 1
 for(i in 1:tests) {
-coupon.rate <- 0.125 
+coupon.rate <- 0.125 + i/400
 {
   # The Prob of Ruin varies between 50% and 0% between
 # a coupon rate of 0.0428 and 0.047
