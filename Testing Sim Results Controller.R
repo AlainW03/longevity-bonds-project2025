@@ -31,7 +31,7 @@ Fund.Monitor.Total.columns <- 70 # integer at least 60
 Feature <- 0 # Should remain 0
 Original.Fund <- c()
 Fund <- c()
-FUND <- as.data.frame(matrix(0,ncol = Total.columns))
+FUND <- as.data.frame(matrix(0,ncol = Fund.Monitor.Total.columns))
 timing <- system.time(source("Merged scripts with Controls.R"))
 time_elapsed <- as.numeric(timing["elapsed"])
 {
@@ -68,6 +68,6 @@ rownames(result) <- c("Simulations",
                       "Runtime")
 
 
-#View(result)
+View(result)
 #View(FUND)
 } 
