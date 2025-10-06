@@ -523,7 +523,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion",
                            "interest", "fixed_increase_rate","reference.population.age","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund",
                            "improv.factor","control","Male.Mortality.Table",
-                           "Female.Mortality.Table","rate_for_discounting", "loss","sim", "tests", "FUND", "ruin","results","Sensitivity_tests_loop_counter")))
+                           "Female.Mortality.Table","rate_for_discounting", "loss","sim", "tests", "BOND","FUND", "ruin","results","results2","results3","Sensitivity_tests_loop_counter")))
 
 
 
@@ -817,7 +817,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  
 # Run this line below to remove all but Mortality.Table and member.base from your environment
  rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest", "fixed_increase_rate","reference.population.age","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund","improv.factor","control", "cut_off","Male.Mortality.Table","Female.Mortality.Table","rate_for_discounting",
-                            "member.base","loss","sim", "tests", "FUND", "ruin","results","Sensitivity_tests_loop_counter")))
+                            "member.base","loss","sim", "tests", "BOND","FUND", "ruin","results","results2","results3","Sensitivity_tests_loop_counter")))
  
  
  
@@ -1087,7 +1087,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","rate_for_discounting","member.base", 
                            "benefit.base", 
                            "EPV", 
-                           "interest","loss","sim", "tests", "FUND", "ruin","results","Sensitivity_tests_loop_counter")))
+                           "interest","loss","sim", "tests", "BOND","FUND", "ruin","results","results2","results3","Sensitivity_tests_loop_counter")))
 
  
  
@@ -1214,7 +1214,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","rate_for_discounting","member.base", 
                            "benefit.base", 
                            "EPV",
-                           "coupon.prop", "interest", "loss","sim", "tests", "FUND", "ruin","results","Sensitivity_tests_loop_counter")))
+                           "coupon.prop", "interest", "loss","sim", "tests", "BOND","FUND", "ruin","results","results2","results3","Sensitivity_tests_loop_counter")))
  
 
 
@@ -1266,7 +1266,10 @@ ruin <- c(ruin, ifelse(sum(Fund[-1] < 0) > 0,1,0))
 Fund.adj <- c(Fund, rep(0,ncol(FUND)-length(Fund)))
 FUND <- rbind(FUND,Fund.adj)
 
-
+if(Bond.Prop > 0) {
+Bond.adj <- c(longevity_bonds_cashflows, rep(0,ncol(BOND)-length(longevity_bonds_cashflows)))
+BOND <- rbind(BOND,Bond.adj)
+}
 
 
 # Creating a plot to visualize the script's current position
@@ -1286,7 +1289,7 @@ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","inte
                           "Female.Mortality.Table","rate_for_discounting","member.base", 
                           "benefit.base", 
                           "EPV",
-                          "coupon.prop", "interest", "loss","sim", "tests", "FUND", "ruin","results","Sensitivity_tests_loop_counter",
+                          "coupon.prop", "interest", "loss","sim", "tests", "BOND","FUND", "ruin","results","results2","results3","Sensitivity_tests_loop_counter",
                           "Bond.Prop",
                           "fixed_percentage",
                           "Fund",

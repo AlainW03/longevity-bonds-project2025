@@ -2,9 +2,9 @@
 # Set the parameters, and run this script at once
 # by pressing Ctrl+Alt+R
 
-simulations <- 100
+simulations <- 200
 Bond.Proportion <- 0 #Controls what prop of fund gets invested into a Longevity Bond
-improv.factor <- -150 # factor that messes with kappa's drift value
+improv.factor <- 0 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
 # the greater (smaller) the effect of the trend will be.
 
@@ -28,10 +28,10 @@ reference.population.age <- 65
 
 # I think I got confused with the rate of return, and the discount rate
 
-interest <- 7 # value between 0 and 100
-fixed_increase_rate <- 4 # value between 0 and 100
+interest <- 10.63 # value between 0 and 100
+fixed_increase_rate <- 5.5 # value between 0 and 100
 rate_for_discounting <- interest # value between 0 and 100
-EPV.mort.risk.margin <- 10 # value between 0 and 100
+EPV.mort.risk.margin <- 43.7 # value between 0 and 100, best estimate around 43.7
 Fund <- c()
 {
   # Over here I am adding a feature control
@@ -50,6 +50,7 @@ Fund <- c()
   Total.columns <- 70
   
   FUND <- as.data.frame(matrix(0,ncol = Total.columns))
+  BOND <- as.data.frame(matrix(0,ncol = Total.columns))
   
   
   
@@ -58,6 +59,8 @@ Fund <- c()
 {
   test <- 1
   Sensitivity_tests_loop_counter <- 1
+  results2 <- c()
+  results3 <- c()
   
 } #Dummy parameters to have the main script work
 
@@ -71,6 +74,13 @@ time_elapsed <- as.numeric(timing["elapsed"])
   colnames(FUND) <- paste0("Y",seq_along(FUND[1,]))
   rownames(FUND) <- paste0("SIM",c(1:(simulations)))
 } #Cleaning up Fund Value monitor
+
+if(Bond.Prop > 0){
+  BOND <- BOND[-1,]
+  BOND <- BOND[,1: (max(  apply(BOND!= 0,MARGIN = 1,FUN = sum) )) ]
+  colnames(BOND) <- paste0("Y",seq_along(BOND[1,]))
+  rownames(BOND) <- paste0("SIM",c(1:(simulations)))
+}else{remove(BOND)} #Cleaning up Bond Value monitor
 
 Original.Fund.Avg <- mean(Original.Fund)
 result <- as.data.frame(rbind(round(simulations,digits = 0),
