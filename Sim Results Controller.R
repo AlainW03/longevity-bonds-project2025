@@ -55,6 +55,12 @@ Fund <- c()
   
 }
 
+{
+  test <- 1
+  Sensitivity_tests_loop_counter <- 1
+  
+} #Dummy parameters to have the main script work
+
 timing <- system.time(source("Merged scripts with Controls.R"))
 
 time_elapsed <- as.numeric(timing["elapsed"])
