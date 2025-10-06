@@ -2,7 +2,7 @@
 # Set the parameters, and run this script at once
 # by pressing Ctrl+Alt+R
 
-simulations <- 400
+simulations <- 1000
 Bond.Proportion <- 0 #Controls what prop of fund gets invested into a Longevity Bond
 improv.factor <- 0 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
@@ -31,7 +31,7 @@ reference.population.age <- 65
 interest <- 10.63 # value between 0 and 100
 fixed_increase_rate <- 5.5 # value between 0 and 100
 rate_for_discounting <- interest # value between 0 and 100
-EPV.mort.risk.margin <- 43 # value between 0 and 100, best estimate around 43
+EPV.mort.risk.margin <- 43.29 # value between 0 and 100, best estimate around 43.29
 Fund <- c()
 {
   # Over here I am adding a feature control
