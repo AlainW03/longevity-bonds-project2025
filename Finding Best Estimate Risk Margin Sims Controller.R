@@ -408,9 +408,12 @@ rownames(results) <- c("Risk Margin", "Prob of Ruin", "VAR %")
     
     
   }
+  y1 <- results[1, as.numeric(which(results[2,] <= 50)[1]) ]
+  x1 <- results[2, as.numeric(which(results[2,] <= 50)[1]) ]
+  y2 <- results[1, as.numeric(which(results[2,] <= 50)[1])-1 ]
+  x2 <- results[2, as.numeric(which(results[2,] <= 50)[1])-1 ]
   
-  EPV.mort.risk.margin<- results[1, as.numeric(which(results[2,] <= 50)[1]) ]
-
+  EPV.mort.risk.margin <- as.numeric(approx(x = c(x1,x2), y = c(y1,y2), xout = 50 )$y)
 
   
 }
