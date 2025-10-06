@@ -9,21 +9,33 @@
 # Set the parameters, and run this script at once
 # by pressing Ctrl+Alt+R
 
+# Pre - loop settings
+tests <- 10 # integer at least 1
+results <- c()
+
+for(i in 1:tests){
+
 
 # Parameters that can be changed: 
-simulations <- 10 # integer at least 1
+
+simulations <- 15 #  integer at least 1
+inital.members <- 100 #  integer at least 10
 Bond.Proportion <- 0 # value between 0 to 100
 improv.factor <- 0 # value between -100 to +100
-results <- c()
 coupon.rate <- 12.5 # value between 0 to 100
-interest <- 22 # value between 0 to 100
-fixed_increase_rate <- 4 # value between 0 and 100
+interest <- 10.63 # value between 0 to 100
+fixed_increase_rate <- 5.5 # value between 0 and 100
 rate_for_discounting <- interest # value between 0 and 100
-EPV.mort.risk.margin <- 45 # value between 0 to 100
-inital.members <- 1000 # integer at least 10
+EPV.mort.risk.margin <- 30 # value between 0 to 100
 reference.population.age <- 65 # integer between 16 to 120
-tests <- 1 # integer at least 1
 Fund.Monitor.Total.columns <- 70 # integer at least 60
+
+Sensitivity_tests_loop_counter <- i
+
+# Targeted Parameter: Risk margin
+# Target Parameter: Prob of ruin 99%
+
+EPV.mort.risk.margin <-  26 + i*2 
 
 
 # Do not touch variables:
@@ -43,7 +55,7 @@ time_elapsed <- as.numeric(timing["elapsed"])
 Original.Fund.Avg <- mean(Original.Fund)
 }
 
-# Crafting and cleaning results
+# Crafting and cleaning result
 {result <- as.data.frame(rbind(round(simulations,digits = 0),
                               round(inital.members,digits = 0),
                               round(Prob.of.ruin*100, digits = 3),
@@ -51,7 +63,7 @@ Original.Fund.Avg <- mean(Original.Fund)
                               round((100*VAR/Original.Fund.Avg),digits = 3),
                               Bond.Proportion,
                               improv.factor,
-                              coupon.rate*100,
+                              coupon.rate,
                               ifelse(Feature==1, "Yes","No"),
                               round(time_elapsed,digits = 3)))
 
@@ -68,6 +80,17 @@ rownames(result) <- c("Simulations",
                       "Runtime")
 
 
-View(result)
+#View(result)
 #View(FUND)
 } 
+
+
+# Results of testing
+sim.and.result <- c(EPV.mort.risk.margin, round(Prob.of.ruin*100, digits = 3),round((100*VAR/Original.Fund.Avg),digits = 3) )
+results <- cbind(results, sim.and.result)
+}
+
+colnames(results) <- seq_along(results[1,])
+rownames(results) <- c("Risk Margin", "Prob of Ruin", "VAR %")
+
+View(results)

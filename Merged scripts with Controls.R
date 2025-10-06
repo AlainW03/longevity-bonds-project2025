@@ -55,7 +55,7 @@ set.seed(780)
   
   
   # Prob of ruin
-  # This is even easier. "ruin","results", is if the fund decreases to a value below 0
+  # This is even easier. "ruin" is if the fund decreases to a value below 0
   # in each simulation. That means we only need a vector of 1's and 0's
   # that records if the final fund value is below 0.
   
@@ -66,13 +66,10 @@ loss <- c()
 ruin <- c()
 
 
-# Parameter controlling the amount of simulations
-
-sim <- simulations
 
 # Creating loop to run multiple simulations
 
-for(Model_Simulation in 1:sim) {
+for(sim in 1:simulations) {
   
 
 
@@ -526,7 +523,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion",
                            "interest", "fixed_increase_rate","reference.population.age","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund",
                            "improv.factor","control","Male.Mortality.Table",
-                           "Female.Mortality.Table","rate_for_discounting", "loss","FUND", "ruin","results")))
+                           "Female.Mortality.Table","rate_for_discounting", "loss","sim", "tests", "FUND", "ruin","results","Sensitivity_tests_loop_counter")))
 
 
 
@@ -820,7 +817,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
  
 # Run this line below to remove all but Mortality.Table and member.base from your environment
  rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","interest", "fixed_increase_rate","reference.population.age","EPV.mort.risk.margin","coupon.rate", "Feature","Original.Fund", "Fund","improv.factor","control", "cut_off","Male.Mortality.Table","Female.Mortality.Table","rate_for_discounting",
-                            "member.base","loss","FUND", "ruin","results")))
+                            "member.base","loss","sim", "tests", "FUND", "ruin","results","Sensitivity_tests_loop_counter")))
  
  
  
@@ -1090,7 +1087,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","rate_for_discounting","member.base", 
                            "benefit.base", 
                            "EPV", 
-                           "interest","loss","FUND", "ruin","results")))
+                           "interest","loss","sim", "tests", "FUND", "ruin","results","Sensitivity_tests_loop_counter")))
 
  
  
@@ -1217,7 +1214,7 @@ Female.Mortality.Table <- Final.Female.Mort.table
                            "Female.Mortality.Table","rate_for_discounting","member.base", 
                            "benefit.base", 
                            "EPV",
-                           "coupon.prop", "interest", "loss","FUND", "ruin","results")))
+                           "coupon.prop", "interest", "loss","sim", "tests", "FUND", "ruin","results","Sensitivity_tests_loop_counter")))
  
 
 
@@ -1269,6 +1266,13 @@ ruin <- c(ruin, ifelse(sum(Fund[-1] < 0) > 0,1,0))
 Fund.adj <- c(Fund, rep(0,ncol(FUND)-length(Fund)))
 FUND <- rbind(FUND,Fund.adj)
 
+
+
+
+# Creating a plot to visualize the script's current position
+x_simulation_vec <- c(1:sim)
+y_tests_vec <- rep(Sensitivity_tests_loop_counter,length(x_simulation_vec))
+plot(x = x_simulation_vec, y = y_tests_vec, xlim = c(1,sim), ylim = c(Sensitivity_tests_loop_counter - 1, Sensitivity_tests_loop_counter + 1), main = "Model progress", xlab = "Simulations completed", ylab = "Tests completed", type = "l")
 }
 
 # And now for the VAR@95% conf and Prob of Ruin calculation
@@ -1282,7 +1286,7 @@ rm(list = setdiff(ls(), c("inital.members","simulations","Bond.Proportion","inte
                           "Female.Mortality.Table","rate_for_discounting","member.base", 
                           "benefit.base", 
                           "EPV",
-                          "coupon.prop", "interest", "loss","FUND", "ruin","results",
+                          "coupon.prop", "interest", "loss","sim", "tests", "FUND", "ruin","results","Sensitivity_tests_loop_counter",
                           "Bond.Prop",
                           "fixed_percentage",
                           "Fund",
