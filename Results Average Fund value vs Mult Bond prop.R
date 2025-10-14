@@ -291,7 +291,7 @@ plot(x = seq_along(Avg.Fund.Values[1,]), y = Avg.Fund.Values[1,],
      xlab = "Years", 
      ylab = "Avg Fund Value", 
      main = "Average Fund Value over the years of the simulation with different % of the starting fund invested into the Longevity Bond",
-     ylim = c(min(Avg.Fund.Values),max(Avg.Fund.Values))
+     ylim = c(min(Avg.Fund.Values),max(Avg.Fund.Values)*1.5)
      )
 lines(x = seq_along(Avg.Fund.Values[1,]), y = Avg.Fund.Values[1,], col = "blue")
 lines(x = seq_along(Avg.Fund.Values[2,]), y = Avg.Fund.Values[2,], col = "red")
@@ -300,7 +300,7 @@ lines(x = seq_along(Avg.Fund.Values[4,]), y = Avg.Fund.Values[4,], col = "orange
 lines(x = seq_along(Avg.Fund.Values[5,]), y = Avg.Fund.Values[5,], col = "purple3")
 
 
-legend("top",
+legend("topright",
        legend = c("0% invested in Longevity Bond",
                   "25% invested in Longevity Bond",
                   "50% invested in Longevity Bond",
@@ -308,4 +308,4 @@ legend("top",
                   "100% invested in Longevity Bond"),
        col = c("blue", "red", "darkgreen", "orange3", "purple3"),
        lty = 1,
-       cex = 0.35, bty = "n")
+       cex = 0.5, bty = "n")
