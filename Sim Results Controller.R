@@ -2,9 +2,9 @@
 # Set the parameters, and run this script at once
 # by pressing Ctrl+Alt+R
 
-simulations <- 1000
-Bond.Proportion <- 0 #Controls what prop of fund gets invested into a Longevity Bond
-improv.factor <- 0 # factor that messes with kappa's drift value
+simulations <- 50
+Bond.Proportion <- 50 #Controls what prop of fund gets invested into a Longevity Bond
+improv.factor <- 50 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
 # the greater (smaller) the effect of the trend will be.
 

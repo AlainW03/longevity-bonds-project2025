@@ -103,4 +103,60 @@ results <- cbind(results, sim.and.result)
 colnames(results) <- seq_along(results[1,])
 rownames(results) <- c("Risk Margin", "Prob of Ruin", "VAR %")
 
-View(results)
+#View(results)
+
+# The next part was me overthinking the average fund
+{
+# Averaging the Fund values over the years, making special allowance for
+# exluding zeros
+
+#Sum.Fund.Value.per.year <- apply(FUND, MARGIN = 2, FUN = sum)
+#Logic.for.non.zero <- apply(FUND != 0 , MARGIN = 2, FUN = sum)
+#Avg.Fund.Value <- as.data.frame(Sum.Fund.Value.per.year/Logic.for.non.zero)
+#rownames(Avg.Fund.Value) <- paste0("Y",seq_along(Avg.Fund.Value[,1]))
+#colnames(Avg.Fund.Value) <- c(paste(c("Average Fund value with ", Bond.Prop*100,"% Bond Prop"), collapse = ""))
+
+#plot(x = seq_along(Avg.Fund.Value[,1]), y = Avg.Fund.Value[,1], type = "l")
+
+# So the plot looks horrible, since the latter years dominate the values and 
+# grow exponentially. Rather, let's find the closest representing Fund
+# value among the simulations:
+
+
+# Compute the Euclidean distance between each row and the average vector
+#avg_vector <- Avg.Fund.Value[-c(40:nrow(Avg.Fund.Value)),1]
+#distances <- apply(FUND[,-c(40:ncol(FUND))], 1, function(row) sqrt(sum((row - avg_vector)^2)))
+
+# Find the index of the row with the smallest distance
+#closest_row_index <- which.min(distances)
+
+# Extract the closest row
+#closest_row <- FUND[closest_row_index, ]
+
+#plot(x = seq_along(closest_row), y = closest_row, type = "l")
+#plot(x = seq_along(FUND[which.max(distances), ]), y = FUND[which.max(distances), ], type = "l")
+}
+
+# Here is the average fund dataset
+avg.fund <- as.data.frame(apply(FUND, MARGIN = 2, FUN = mean))
+rownames(avg.fund) <- paste0("Y",seq_along(avg.fund[,1]))
+colnames(avg.fund) <- c(paste(c("Average Fund value with ", Bond.Prop*100,"% Bond Prop"), collapse = ""))
+plot(x = seq_along(avg.fund[,1]), y = avg.fund[,1], type = "l", xlab = "Years", ylab = "Avg Fund Value", main = paste("Average Fund Value over the years of the simulation with ", Bond.Prop*100,"% of the starting fund invested into the Longevity Bond"))
+
+
+#Optionally you can also look at the simulation that has values that was the 
+# closest to the average fund values
+{
+# And the closest row to that?
+
+#avg_vector <- avg.fund
+#distances <- apply(FUND, 1, function(row) sqrt(sum((row - avg_vector)^2)))
+
+# Find the index of the row with the smallest distance
+#closest_row_index <- which.min(distances)
+
+# Extract the closest row
+#closest_row_normal_avg <- FUND[closest_row_index, ]
+
+#plot(x = seq_along(closest_row_normal_avg), y = closest_row_normal_avg, type = "l")
+}
