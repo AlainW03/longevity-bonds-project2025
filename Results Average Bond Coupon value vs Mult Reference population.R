@@ -292,7 +292,7 @@ rownames(Avg.Bond.Values) <- c("65", "75", "85", "95")
 plot(x = seq_along(Avg.Bond.Values[1,]), y = Avg.Bond.Values[1,], 
      type = "n",
      xlab = "Years", 
-     ylab = "Avg Bond Value", 
+     ylab = "Avg Coupon amount", 
      main = "Average Longevity Bond Coupon amounts over the years of the simulation with different choices for the starting age of the reference population 
      (showing effect of mismatch of the Fund's ages and the reference ages for the coupons)",
      ylim = c(min(Avg.Bond.Values),max(Avg.Bond.Values)*1.5),
