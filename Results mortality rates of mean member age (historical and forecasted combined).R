@@ -133,4 +133,4 @@ lines(x = c(15,15), y = c(0,(ceiling(max(Male.mean.age.mort[1,-1])*100)/100)   )
 legend("topright", legend = c("Male mortality rate", "Female mortality rate"), 
        col = c("blue", "violetred1"),
        lty = 2,
-       cex = 0.5)
+       cex = 0.75)
