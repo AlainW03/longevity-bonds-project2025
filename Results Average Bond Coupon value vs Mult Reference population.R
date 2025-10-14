@@ -295,8 +295,9 @@ plot(x = seq_along(Avg.Bond.Values[1,]), y = Avg.Bond.Values[1,],
      ylab = "Avg Bond Value", 
      main = "Average Longevity Bond Coupon amounts over the years of the simulation with different choices for the starting age of the reference population 
      (showing effect of mismatch of the Fund's ages and the reference ages for the coupons)",
-     ylim = c(min(Avg.Bond.Values),max(Avg.Bond.Values)*1.5)
-)
+     ylim = c(min(Avg.Bond.Values),max(Avg.Bond.Values)*1.5),
+     cex.main = 0.8
+     )
 lines(x = seq_along(Avg.Bond.Values[1,]), y = Avg.Bond.Values[1,], col = "blue")
 lines(x = seq_along(Avg.Bond.Values[2,]), y = Avg.Bond.Values[2,], col = "red")
 lines(x = seq_along(Avg.Bond.Values[3,]), y = Avg.Bond.Values[3,], col = "darkgreen")
