@@ -180,7 +180,7 @@ plot(x = seq_along(avg.fund[,1]), y = avg.fund[,1], type = "l", xlab = "Years", 
 
 # So, since I don't need the Feature variable here, I'm using it as a place holder
 # for the results overtime, since it doesn't get erased.
-vector <- c(avg.fund[,1], rep(0,30))
+vector <- c(avg.fund[,1])
 Feature <- as.data.frame(matrix(vector, nrow = 1))
 
 # Now to repeat the simulation for different bond prop
@@ -292,6 +292,29 @@ colnames(Avg.Fund.Values) <- paste0("Y", seq_along(Avg.Fund.Values[1,]))
 Bond.props <- 0 + (100/tests)*(0:tests)
 rownames(Avg.Fund.Values) <- paste0(Bond.props,"%")
 
+
+
+
+# Now to plot the results
+
+# First, generate distinct colours
+
+generate_rgb_colours <- function(n) {
+  # Generate hues evenly spaced around the color wheel
+  hues <- seq(0, 360, length.out = n + 1)[-1]  # remove last to avoid duplicate hue
+  
+  # Convert HCL to RGB using grDevices::hcl and then to hex
+  colours_vec <- grDevices::hcl(h = hues, c = 150, l = 55)
+  
+  return(colours_vec)
+}
+
+# Generating colours
+n <- nrow(Avg.Fund.Values)
+colours_vec <- generate_rgb_colours(n)
+
+
+
 plot(x = seq_along(Avg.Fund.Values[1,]), y = Avg.Fund.Values[1,], 
      type = "n",
      xlab = "Years", 
@@ -299,19 +322,19 @@ plot(x = seq_along(Avg.Fund.Values[1,]), y = Avg.Fund.Values[1,],
      main = "Average Fund Value over the years of the simulation with different % of the starting fund invested into the Longevity Bond",
      ylim = c(min(Avg.Fund.Values),max(Avg.Fund.Values)*1.5)
      )
-lines(x = seq_along(Avg.Fund.Values[1,]), y = Avg.Fund.Values[1,], col = "blue")
-lines(x = seq_along(Avg.Fund.Values[2,]), y = Avg.Fund.Values[2,], col = "red")
-lines(x = seq_along(Avg.Fund.Values[3,]), y = Avg.Fund.Values[3,], col = "darkgreen")
-lines(x = seq_along(Avg.Fund.Values[4,]), y = Avg.Fund.Values[4,], col = "orange3")
-lines(x = seq_along(Avg.Fund.Values[5,]), y = Avg.Fund.Values[5,], col = "purple3")
 
+for(k in 1:n) {
+  
+  lines(x = seq_along(Avg.Fund.Values[k,]), y = Avg.Fund.Values[k,], col = colours_vec[k])
+}
+
+text_width <- strwidth("100% invested in Longevity Bond", cex = 0.5)
+legend_text <- paste0(Bond.props,"% invested in Longevity Bond")
 
 legend("topright",
-       legend = c("0% invested in Longevity Bond",
-                  "25% invested in Longevity Bond",
-                  "50% invested in Longevity Bond",
-                  "75% invested in Longevity Bond",
-                  "100% invested in Longevity Bond"),
-       col = c("blue", "red", "darkgreen", "orange3", "purple3"),
+       legend = legend_text,
+       col = colours_vec,
        lty = 1,
-       cex = 0.5, bty = "n")
+       cex = 0.5, bty = "n",
+       y.intersp = 0.3,
+       text.width = text_width*0.5)
