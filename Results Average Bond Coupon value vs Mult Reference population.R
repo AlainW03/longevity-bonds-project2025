@@ -186,10 +186,10 @@ Feature <- (matrix(avg.bond[,1], ncol = length(avg.bond[,1])))
 # Now to repeat the simulation for different bond prop
 
 
-for(j in 1:3) {
+
 
 # Pre - loop settings
-tests <- 1 # integer at least 1
+tests <- 3 # integer at least 1
 results <- c()
 
 for(i in 1:tests){
@@ -206,7 +206,7 @@ for(i in 1:tests){
   fixed_increase_rate <- fixed_increase_rate # value between 0 and 100
   rate_for_discounting <- interest # value between 0 and 100
   EPV.mort.risk.margin <- EPV.mort.risk.margin # value between 0 to 100
-  reference.population.age <- 65 + 10*j # integer between 16 to 120
+  reference.population.age <- 65 + (30/tests)*i # integer between 16 to 120
   Fund.Monitor.Total.columns <- 70 # integer at least 60
   
   Sensitivity_tests_loop_counter <- i
@@ -253,7 +253,7 @@ for(i in 1:tests){
   # Results of testing
   sim.and.result <- c(EPV.mort.risk.margin, round(Prob.of.ruin*100, digits = 3),round((100*VAR/Original.Fund.Avg),digits = 3) )
   results <- cbind(results, sim.and.result)
-}
+
 
 #colnames(results) <- seq_along(results[1,])
 #rownames(results) <- c("Risk Margin", "Prob of Ruin", "VAR %")
@@ -284,7 +284,29 @@ Feature <- rbind(Feature, avg.bond.adj)
 Avg.Bond.Values <- as.data.frame(Feature)
 Feature <- 0
 colnames(Avg.Bond.Values) <- paste0("Y", seq_along(Avg.Bond.Values[1,]))
-rownames(Avg.Bond.Values) <- c("65", "75", "85", "95")
+ref.ages <- 65 + (30/tests)*(0:tests)
+rownames(Avg.Bond.Values) <- ref.ages
+
+
+
+#Lets plot the results
+
+
+# First, generate distinct colours
+
+generate_rgb_colours <- function(n) {
+  # Generate hues evenly spaced around the color wheel
+  hues <- seq(0, 360, length.out = n + 1)[-1]  # remove last to avoid duplicate hue
+  
+  # Convert HCL to RGB using grDevices::hcl and then to hex
+  colours_vec <- grDevices::hcl(h = hues, c = 150, l = 55)
+  
+  return(colours_vec)
+}
+
+# Generating colours
+n <- nrow(Avg.Bond.Values)
+colours_vec <- generate_rgb_colours(n)
 
 plot(x = seq_along(Avg.Bond.Values[1,]), y = Avg.Bond.Values[1,], 
      type = "n",
@@ -295,20 +317,23 @@ plot(x = seq_along(Avg.Bond.Values[1,]), y = Avg.Bond.Values[1,],
      ylim = c(min(Avg.Bond.Values),max(Avg.Bond.Values)*1.5),
      cex.main = 0.8
      )
-lines(x = seq_along(Avg.Bond.Values[1,]), y = Avg.Bond.Values[1,], col = "blue")
-lines(x = seq_along(Avg.Bond.Values[2,]), y = Avg.Bond.Values[2,], col = "red")
-lines(x = seq_along(Avg.Bond.Values[3,]), y = Avg.Bond.Values[3,], col = "darkgreen")
-lines(x = seq_along(Avg.Bond.Values[4,]), y = Avg.Bond.Values[4,], col = "orange3")
+
+for(k in 1:n) {
+  
+  lines(x = seq_along(Avg.Bond.Values[k,]), y = Avg.Bond.Values[k,], col = colours_vec[k])
+}
 
 
+text_width <- strwidth("Reference Population start at age 95", cex = 0.5)
+legend_text <- paste0("Reference Population start at age ", ref.ages)
 
 legend("topright",
-       legend = c("Reference Population start at age 65",
-                  "Reference Population start at age 75",
-                  "Reference Population start at age 85",
-                  "Reference Population start at age 95"
-       ),
-       col = c("blue", "red", "darkgreen", "orange3"),
+       legend = legend_text,
+       col = colours_vec,
        lty = 1,
-       cex = 0.5, bty = "n", y.intersp = 0.6)
+       cex = 0.5, bty = "n",
+       y.intersp = 0.3,
+       text.width = text_width*0.5)
+
+
 
