@@ -26,7 +26,7 @@ for(i in 1:tests){
   simulations <- 30 #  integer at least 1
   inital.members <- 100 #  integer at least 10
   Bond.Proportion <- 50 # value between 0 to 100
-  improv.factor <- 0 # value between -100 to +100
+  improv.factor <- 50 # value between -100 to +100
   coupon.rate <- 12.5 # value between 0 to 100
   interest <- 10.63 # value between 0 to 100
   fixed_increase_rate <- 5.5 # value between 0 and 100
@@ -198,22 +198,19 @@ for(i in 1:tests){
   # Parameters that can be changed: 
   
   simulations <- simulations # simulations variable also doesn't get erased
-  inital.members <- 100 #  integer at least 10
-  Bond.Proportion <- 50 # value between 0 to 100
-  improv.factor <- 0 # value between -100 to +100
-  coupon.rate <- 12.5 # value between 0 to 100
-  interest <- 10.63 # value between 0 to 100
-  fixed_increase_rate <- 5.5 # value between 0 and 100
+  inital.members <- inital.members #  integer at least 10
+  Bond.Proportion <- Bond.Proportion # value between 0 to 100
+  improv.factor <- improv.factor # value between -100 to +100
+  coupon.rate <- coupon.rate # value between 0 to 100
+  interest <- interest # value between 0 to 100
+  fixed_increase_rate <- fixed_increase_rate # value between 0 and 100
   rate_for_discounting <- interest # value between 0 and 100
-  EPV.mort.risk.margin <- 43.29 # value between 0 to 100
+  EPV.mort.risk.margin <- EPV.mort.risk.margin # value between 0 to 100
   reference.population.age <- 65 + 10*j # integer between 16 to 120
   Fund.Monitor.Total.columns <- 70 # integer at least 60
   
   Sensitivity_tests_loop_counter <- i
-  # Targeted Parameter: Risk margin
-  # Target Parameter: Prob of ruin 99%
-  
-  #EPV.mort.risk.margin <-  26 + i*2 
+
   
   
   # Do not touch variables:
@@ -305,7 +302,7 @@ lines(x = seq_along(Avg.Bond.Values[4,]), y = Avg.Bond.Values[4,], col = "orange
 
 
 
-legend("topleft",
+legend("topright",
        legend = c("Reference Population start at age 65",
                   "Reference Population start at age 75",
                   "Reference Population start at age 85",
@@ -313,5 +310,5 @@ legend("topleft",
        ),
        col = c("blue", "red", "darkgreen", "orange3"),
        lty = 1,
-       cex = 0.5, bty = "n")
+       cex = 0.5, bty = "n", y.intersp = 0.6)
 
