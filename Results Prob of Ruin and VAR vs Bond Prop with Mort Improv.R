@@ -157,7 +157,7 @@ legend("topright",
        col = colours_vec,
        lty = 1,
        cex = 0.6,
-       bty = "n", lwd = 1)
+       bty = "n", lwd = 1, y.intersp = 0.5)
 
 
 }
@@ -181,7 +181,7 @@ legend("topright",
            col = colours_vec,
            lty = 1,
            cex = 0.6,
-           bty = "n", lwd = 1)
+           bty = "n", lwd = 1, y.intersp = 0.5)
     
   }
 
