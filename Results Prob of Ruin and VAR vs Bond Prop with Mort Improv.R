@@ -152,12 +152,19 @@ lines(x = Bond.props, y = Result.Prob.of.Ruin[k,], col = colours_vec[k], lty = 1
 
 }
 
-legend("topright",
-       legend = paste0("Increasing Mortality Improvement Trend by ", Improv.factors, "%"),
-       col = colours_vec,
-       lty = 1,
-       cex = 0.6,
-       bty = "n", lwd = 1, y.intersp = 0.5)
+    text_width <- max(strwidth(paste0("Increasing Mortality Improvement Trend by ", Improv.factors, "%"))) -
+      min(strwidth(paste0("Increasing Mortality Improvement Trend by ", Improv.factors, "%"), cex = 0.5))
+    legend_text <- paste0("Increasing Mortality Improvement Trend by ", Improv.factors, "%")
+    legend("topright",
+           legend = legend_text,
+           col = colours_vec,
+           lty = 1,
+           cex = 0.6,
+           bty = "n",
+           lwd = 1,
+           y.intersp = 0.5,
+           xjust = 1,
+           text.width = text_width*0.5)
 
 
 }
@@ -176,12 +183,27 @@ legend("topright",
       
     }
     
+    
+    
+    
+    text_width <- max(strwidth(paste0("Increasing Mortality Improvement Trend by ", Improv.factors, "%"))) -
+      min(strwidth(paste0("Increasing Mortality Improvement Trend by ", Improv.factors, "%"), cex = 0.5))
+    legend_text <- paste0("Increasing Mortality Improvement Trend by ", Improv.factors, "%")
     legend("topright",
-           legend = paste0("Increasing Mortality Improvement Trend by ", Improv.factors, "%"),
+           legend = legend_text,
            col = colours_vec,
            lty = 1,
            cex = 0.6,
-           bty = "n", lwd = 1, y.intersp = 0.5)
+           bty = "n",
+           lwd = 1,
+           y.intersp = 0.5,
+           xjust = 1,
+           text.width = text_width*0.5)
+    
+    
+    
+    
+
     
   }
 
