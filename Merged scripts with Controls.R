@@ -1236,7 +1236,7 @@ notional <- Fund * Bond.Prop # Bond Value
 Fund <- Fund - notional
 longevity_bonds_cashflows <- fixed_percentage*notional*coupon.prop
 
-for(i in 2:(ncol(benefit.base)-4)){
+for(i in 2:(ncol(benefit.base)-3)){
   
   Fund[i] <- (Fund[i-1])  * (1+(interest * ifelse(Fund[i-1] > 0, 1, 0)/100)) - sum(benefit.base[,i+3]) + longevity_bonds_cashflows[i-1]
   
