@@ -180,16 +180,16 @@ plot(x = seq_along(avg.fund[,1]), y = avg.fund[,1], type = "l", xlab = "Years", 
 
 # So, since I don't need the Feature variable here, I'm using it as a place holder
 # for the results overtime, since it doesn't get erased.
-
-Feature <- avg.fund[,1]
+vector <- c(avg.fund[,1], rep(0,30))
+Feature <- as.data.frame(matrix(vector, nrow = 1))
 
 # Now to repeat the simulation for different bond prop
 
 
-for(j in 1:4) {
+
 
 # Pre - loop settings
-tests <- 1 # integer at least 1
+tests <- 4 # integer at least 1
 results <- c()
 
 for(i in 1:tests){
@@ -199,7 +199,7 @@ for(i in 1:tests){
   
   simulations <- simulations # simulations variable also doesn't get erased
   inital.members <- 100 #  integer at least 10
-  Bond.Proportion <- 0 + 25*j # value between 0 to 100
+  Bond.Proportion <- 0 + (100/tests)*i # value between 0 to 100
   improv.factor <- 0 # value between -100 to +100
   coupon.rate <- 12.5 # value between 0 to 100
   interest <- 10.63 # value between 0 to 100
@@ -227,7 +227,7 @@ for(i in 1:tests){
     time_elapsed <- as.numeric(timing["elapsed"])
     {
       FUND <- FUND[-1,]
-      FUND <- FUND[,1: (max(  apply(FUND!= 0,MARGIN = 1,FUN = sum) )) ]
+      FUND <- FUND[,1: (max(  apply(FUND[,-1]!= 0,MARGIN = 1,FUN = sum) )+1) ]
       colnames(FUND) <- paste0("Y",seq_along(FUND[1,]))
       rownames(FUND) <- paste0("SIM",c(1:(simulations)))
     } #Cleaning up Fund Value monitor
@@ -256,24 +256,29 @@ for(i in 1:tests){
   # Results of testing
   sim.and.result <- c(EPV.mort.risk.margin, round(Prob.of.ruin*100, digits = 3),round((100*VAR/Original.Fund.Avg),digits = 3) )
   results <- cbind(results, sim.and.result)
-}
+
 
 #colnames(results) <- seq_along(results[1,])
 #rownames(results) <- c("Risk Margin", "Prob of Ruin", "VAR %")
 
 #View(results)
+  
 
-# Here is the average fund dataset
+
 avg.fund <- as.data.frame(apply(FUND, MARGIN = 2, FUN = mean))
-rownames(avg.fund) <- paste0("Y",seq_along(avg.fund[,1]))
-colnames(avg.fund) <- c(paste(c("Average Fund value with ", Bond.Prop*100,"% Bond Prop"), collapse = ""))
-plot(x = seq_along(avg.fund[,1]), y = avg.fund[,1], type = "l", xlab = "Years", ylab = "Avg Fund Value", main = paste("Average Fund Value over the years of the simulation with ", Bond.Prop*100,"% of the starting fund invested into the Longevity Bond"))
-
-
+avg.fund.adj <- avg.fund[,1]
+  # Now to combine the results sofar with the placekeeper variable:
+#  if(ncol(Feature) > nrow(avg.fund)){
+#    avg.fund.adj <- c(avg.fund[,1], rep(0,ncol(Feature)-length(avg.fund[,1])))
+#  }else{avg.fund.adj <- avg.fund[,1]}
+  
+  Feature <- rbind(Feature, avg.fund.adj)
+  
+  
 
 # Now to combine the results sofar with the placekeeper variable:
 
-Feature <- rbind(Feature, avg.fund[,1])
+#Feature <- rbind(Feature, avg.fund[,1])
 
 
 }
@@ -284,7 +289,8 @@ Feature <- rbind(Feature, avg.fund[,1])
 Avg.Fund.Values <- as.data.frame(Feature)
 Feature <- 0
 colnames(Avg.Fund.Values) <- paste0("Y", seq_along(Avg.Fund.Values[1,]))
-rownames(Avg.Fund.Values) <- c("0%", "25%", "50%", "75%", "100%")
+Bond.props <- 0 + (100/tests)*(0:tests)
+rownames(Avg.Fund.Values) <- paste0(Bond.props,"%")
 
 plot(x = seq_along(Avg.Fund.Values[1,]), y = Avg.Fund.Values[1,], 
      type = "n",
