@@ -121,17 +121,70 @@ rownames(Result.Prob.of.Ruin) <- paste0("Improv ", Improv.factors, "%")
 rownames(Result.VAR.as.percentage) <- paste0("Improv ", Improv.factors, "%")
 
 # Plotting results
-{#plot(x = results[1,]*100, y = results[3,], type = "n",
-#     main = "Prob of ruin and Var vs Proportion invested into Longevity Bond",
-#     xlab = "Bond Proportion %",
-#     ylab = "%",
-#     ylim = c(0,max(results)))
-#lines(x = results[1,]*100, y = results[2,], col = "blue", lty = 1)
-#lines(x = results[1,]*100, y = results[3,], col = "red", lty = 2)
-#legend("center",
-#       legend = c("VAR as %", "Prob of Ruin"),
-#       col = c( "red","blue"),
-#       lty = c(2,1),
-#       cex = 0.6,
-#       bty = "n")
+{
+  
+  # Function to generate n visually distinct RGB colors
+  generate_rgb_colours <- function(n) {
+    # Generate hues evenly spaced around the color wheel
+    hues <- seq(0, 360, length.out = n + 1)[-1]  # remove last to avoid duplicate hue
+    
+    # Convert HCL to RGB using grDevices::hcl and then to hex
+    colours_vec <- grDevices::hcl(h = hues, c = 100, l = 65)
+    
+    return(colours_vec)
+  }
+  
+  # Generating colours
+  n <- nrow(Result.Prob.of.Ruin)
+  colours_vec <- generate_rgb_colours(n)
+  
+  # Results of the Prob of Ruin
+  
+  {  
+plot(x = Bond.props, y = Result.Prob.of.Ruin[1,], type = "n",
+     main = "Prob of ruin vs Proportion invested into Longevity Bond",
+     xlab = "Bond Proportion %",
+     ylab = "%",
+     ylim = c(0,max(Result.Prob.of.Ruin)*1.5))
+
+for(k in 1:n){
+lines(x = Bond.props, y = Result.Prob.of.Ruin[k,], col = colours_vec[k], lty = 1)
+
+}
+
+legend("topright",
+       legend = paste0("Increasing Mortality Improvement Trend by ", Improv.factors, "%"),
+       col = colours_vec,
+       lty = 1,
+       cex = 0.6,
+       bty = "n", lwd = 1)
+
+
+}
+
+  # Results of the VAR as %
+  {
+    
+    plot(x = Bond.props, y = Result.VAR.as.percentage[1,], type = "n",
+         main = "VAR as % vs Proportion invested into Longevity Bond",
+         xlab = "Bond Proportion %",
+         ylab = "%",
+         ylim = c(0,max(Result.VAR.as.percentage)*1.5))
+    
+    for(k in 1:n){
+      lines(x = Bond.props, y = Result.VAR.as.percentage[k,], col = colours_vec[k], lty = 1)
+      
+    }
+    
+    legend("topright",
+           legend = paste0("Increasing Mortality Improvement Trend by ", Improv.factors, "%"),
+           col = colours_vec,
+           lty = 1,
+           cex = 0.6,
+           bty = "n", lwd = 1)
+    
+  }
+
+
+
 }
