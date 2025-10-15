@@ -32,7 +32,7 @@
 # First, let's set a script wide seed for consistent results. As it is now, 
 # the seeds are giving us only one possible result for each piece of the model.
 
-set.seed(780)
+if(class(Feature) != "list"){set.seed(780)}else if(Feature[[1]] != "Deactivate seed"){set.seed(780)}
 
 
 
