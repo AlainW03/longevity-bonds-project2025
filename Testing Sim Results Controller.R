@@ -10,15 +10,16 @@
 # by pressing Ctrl+Alt+R
 
 # Pre - loop settings
-tests <- 1 # integer at least 1
+tests <- 10 # integer at least 1
 results <- c()
+
 
 for(i in 1:tests){
   
   
   # Parameters that can be changed: 
   
-  simulations <- 200 #  integer at least 1
+  simulations <- 10#  integer at least 1
   inital.members <- 100 #  integer at least 10
   Bond.Proportion <- 0 # value between 0 to 100
   improv.factor <- 0 # value between -100 to +100
