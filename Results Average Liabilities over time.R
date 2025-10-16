@@ -22,7 +22,7 @@ for(i in 1:tests){
   inital.members <- 100 #  integer at least 10
   Bond.Proportion <- 50 # value between 0 to 100
   improv.factor <- 0 # value between -100 to +100
-  coupon.rate <- 12.5 # value between 0 to 100
+  coupon.rate <- 13.17 # value between 0 to 100
   interest <- 10.63 # value between 0 to 100
   fixed_increase_rate <- 5.5 # value between 0 and 100
   rate_for_discounting <- interest # value between 0 and 100
