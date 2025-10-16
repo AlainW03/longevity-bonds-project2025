@@ -1273,9 +1273,9 @@ BOND <- rbind(BOND,Bond.adj)
 
 
 # Creating a plot to visualize the script's current position
-x_simulation_vec <- c(1:sim)
+x_simulation_vec <- c(0:sim)
 y_tests_vec <- rep(Sensitivity_tests_loop_counter,length(x_simulation_vec))
-plot(x = x_simulation_vec, y = y_tests_vec, xlim = c(1,sim), ylim = c(Sensitivity_tests_loop_counter - 1, Sensitivity_tests_loop_counter + 1), main = "Model progress", xlab = "Simulations completed", ylab = "Tests completed", type = "l")
+plot(x = x_simulation_vec, y = y_tests_vec, xlim = c(1,simulations), ylim = c(Sensitivity_tests_loop_counter - 1, Sensitivity_tests_loop_counter + 1), main = "Model progress", xlab = paste("Simulations completed out of ", simulations), ylab = paste("Test ", Sensitivity_tests_loop_counter, " out of ",tests," in progress"), type = "l", lwd = 5, col = "#0E4B75", yaxt = "n")
 }
 
 # And now for the VAR@95% conf and Prob of Ruin calculation
