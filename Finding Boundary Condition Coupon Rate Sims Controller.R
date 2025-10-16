@@ -15,7 +15,9 @@ results <- c()
 
 for(i in 1:tests){
 
-
+# For this round, 10 simulations are sufficient to determine that the Prob of ruin
+  # goes from 100% to 0% between coupon rate 10% to 15%
+  
 # Parameters that can be changed: 
 
 simulations <- 10 #  integer at least 1
@@ -199,15 +201,18 @@ rownames(results) <- c("Coupon rate", "Prob of Ruin", "VAR %")
   
   {
     # Pre - loop settings
-    tests <- 10 # integer at least 1
+    tests <- 5 # integer at least 1
     results <- c()
     
     for(i in 1:tests){
       
-      
+      # For this run, 0.5 is too small, so 5 tests with a 1% interval is sufficient at
+      # 50 simulations. Though, the shift of 0.5 above is suitable, as it causes at most
+      # 50% change in the prob of ruin, guaranteeing that we start with at least 50%
+      # prob of ruin
       # Parameters that can be changed: 
       
-      simulations <- 40 #  integer at least 1
+      simulations <- 50 #  integer at least 1
       inital.members <- 100 #  integer at least 10
       Bond.Proportion <- Bond.Proportion# value between 0 to 100
       improv.factor <- 0 # value between -100 to +100
@@ -223,7 +228,7 @@ rownames(results) <- c("Coupon rate", "Prob of Ruin", "VAR %")
       # Targeted Parameter: Coupon rate
       # Target Parameter: Prob of ruin 1%
       
-      coupon.rate <-  coupon.rate + i*0.5 
+      coupon.rate <-  coupon.rate + 0.5 
       
       
       # Do not touch variables:
@@ -293,7 +298,7 @@ rownames(results) <- c("Coupon rate", "Prob of Ruin", "VAR %")
     }
     
     colnames(results) <- seq_along(results[1,])
-    rownames(results) <- c("Risk Margin", "Prob of Ruin", "VAR %")
+    rownames(results) <- c("Coupon rate", "Prob of Ruin", "VAR %")
   }
   
   
@@ -303,13 +308,13 @@ rownames(results) <- c("Coupon rate", "Prob of Ruin", "VAR %")
   
   first_negative_position <- as.numeric(which(results3[2,] < 0)[1])
   
-  coupon.rate <- as.numeric(results3[1,first_negative_position - 1]) - 0.05 
+  coupon.rate <- as.numeric(results3[1,first_negative_position - 1]) - 0.2 
   
   # Run simulation the last time
   
   {
     # Pre - loop settings
-    tests <- 10 # integer at least 1
+    tests <- 5 # integer at least 1
     results <- c()
     
     for(i in 1:tests){
@@ -317,7 +322,7 @@ rownames(results) <- c("Coupon rate", "Prob of Ruin", "VAR %")
       
       # Parameters that can be changed: 
       
-      simulations <- 160 #  integer at least 1
+      simulations <- 150 #  integer at least 1
       inital.members <- 100 #  integer at least 10
       Bond.Proportion <- Bond.Proportion # value between 0 to 100
       improv.factor <- 0 # value between -100 to +100
@@ -333,7 +338,7 @@ rownames(results) <- c("Coupon rate", "Prob of Ruin", "VAR %")
       # Targeted Parameter: Coupon rate
       # Target Parameter: Prob of ruin 1%
       
-      coupon.rate <-  coupon.rate + i*0.05 
+      coupon.rate <-  coupon.rate + 0.2 
       
       
       # Do not touch variables:
@@ -404,16 +409,138 @@ rownames(results) <- c("Coupon rate", "Prob of Ruin", "VAR %")
     }
     
     colnames(results) <- seq_along(results[1,])
-    rownames(results) <- c("Risk Margin", "Prob of Ruin", "VAR %")
+    rownames(results) <- c("Coupon Rate", "Prob of Ruin", "VAR %")
     
     
   }
+  
+  
+  # results should be above this line
+  
+  results2 <- rbind(results[1,],(results[2,] - 1)/1)
+  
+  first_negative_position <- as.numeric(which(results2[2,] < 0)[1])
+  
+  coupon.rate <- as.numeric(results2[1,first_negative_position - 1]) - 0.2
+  
+  
+  # Run simulation one last time
+  
+  
+  {
+    # Pre - loop settings
+    tests <- 2 # integer at least 1
+    results <- c()
+    
+    for(i in 1:tests){
+      
+      # This simulation now calculates the accurate prob of ruin, and will
+      # use that info to interpolate the coupon, which should be accurate to at
+      # least 1 decimal figure (we don't really care to be even more accurate than
+      # that.)
+      # Parameters that can be changed: 
+      
+      simulations <- 1000 #  integer at least 1
+      inital.members <- 100 #  integer at least 10
+      Bond.Proportion <- Bond.Proportion # value between 0 to 100
+      improv.factor <- 0 # value between -100 to +100
+      #coupon.rate <- 12.5 # value between 0 to 100
+      interest <- 10.63 # value between 0 to 100
+      fixed_increase_rate <- 5.5 # value between 0 and 100
+      rate_for_discounting <- interest # value between 0 and 100
+      reference.population.age <- 65 # integer between 16 to 120
+      Fund.Monitor.Total.columns <- 70 # integer at least 60
+      EPV.mort.risk.margin <- 43.29
+      Sensitivity_tests_loop_counter <- i
+      
+      # Targeted Parameter: Coupon rate
+      # Target Parameter: Prob of ruin 1%
+      
+      coupon.rate <-  coupon.rate + 0.2 
+      
+      
+      # Do not touch variables:
+      {
+        Feature <- 0 # Should remain 0
+        Original.Fund <- c()
+        Fund <- c()
+        FUND <- as.data.frame(matrix(0,ncol = Fund.Monitor.Total.columns))
+        BOND <- as.data.frame(matrix(0,ncol = Fund.Monitor.Total.columns))
+        timing <- system.time(source("Merged scripts with Controls.R"))
+        time_elapsed <- as.numeric(timing["elapsed"])
+        {
+          FUND <- FUND[-1,]
+          FUND <- FUND[,1: (max(  apply(FUND!= 0,MARGIN = 1,FUN = sum) )) ]
+          colnames(FUND) <- paste0("Y",seq_along(FUND[1,]))
+          rownames(FUND) <- paste0("SIM",c(1:(simulations)))
+        } #Cleaning up Fund Value monitor
+        
+        if(Bond.Prop > 0){
+          BOND <- BOND[-1,]
+          BOND <- BOND[,1: (max(  apply(BOND!= 0,MARGIN = 1,FUN = sum) )) ]
+          colnames(BOND) <- paste0("Y",seq_along(BOND[1,]))
+          rownames(BOND) <- paste0("SIM",c(1:(simulations)))
+        }else{remove(BOND)} #Cleaning up Bond Value monitor
+        
+        Original.Fund.Avg <- mean(Original.Fund)
+        results2 <- c()
+        results3 <- c()
+      }
+      
+      # Crafting and cleaning result
+      {result <- as.data.frame(rbind(round(simulations,digits = 0),
+                                     round(inital.members,digits = 0),
+                                     round(Prob.of.ruin*100, digits = 3),
+                                     round(VAR,digits = 3),
+                                     round((100*VAR/Original.Fund.Avg),digits = 3),
+                                     Bond.Proportion,
+                                     improv.factor,
+                                     coupon.rate,
+                                     ifelse(Feature==1, "Yes","No"),
+                                     round(time_elapsed,digits = 3)))
+        
+        colnames(result) <- "Results"
+        rownames(result) <- c("Simulations",
+                              "Initial Nr of Members",
+                              "Prob of Ruin %",
+                              "VAR @ 95%",
+                              "VAR as % of Original Fund",
+                              "Prop invested in Bond",
+                              "Mort Improvement Factor",
+                              "Coupon Rate %",
+                              "Feature active?",
+                              "Runtime")
+        
+        
+        #View(result)
+        #View(FUND)
+      } 
+      
+      
+      # Results of testing
+      sim.and.result <- c(coupon.rate, round(Prob.of.ruin*100, digits = 3),round((100*VAR/Original.Fund.Avg),digits = 3) )
+      results <- cbind(results, sim.and.result)
+      
+      
+      
+      
+    }
+    
+    colnames(results) <- seq_along(results[1,])
+    rownames(results) <- c("Coupon Rate", "Prob of Ruin", "VAR %")
+    
+    
+  }
+  
+  
   y1 <- results[1, as.numeric(which(results[2,] <= 1)[1]) ]
   x1 <- results[2, as.numeric(which(results[2,] <= 1)[1]) ]
   y2 <- results[1, as.numeric(which(results[2,] <= 1)[1])-1 ]
   x2 <- results[2, as.numeric(which(results[2,] <= 1)[1])-1 ]
   
   coupon.rate <- as.numeric(approx(x = c(x1,x2), y = c(y1,y2), xout = 1 )$y)
+  
+  # Results show that 13.17 is the coupon rate that meets the boundary condition
 
   
 }
