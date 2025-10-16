@@ -2,7 +2,7 @@
 # Set the parameters, and run this script at once
 # by pressing Ctrl+Alt+R
 
-simulations <- 1000
+simulations <- 10
 Bond.Proportion <- 100 #Controls what prop of fund gets invested into a Longevity Bond
 improv.factor <- 50 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
@@ -10,21 +10,13 @@ improv.factor <- 50 # factor that messes with kappa's drift value
 results <- c()
 tests <- 10
 for(i in 1:tests) {
-coupon.rate <- 0.1245 + i/400
+coupon.rate <- 12.44 + i/50
 {
-  # The Prob of Ruin varies between 50% and 0% between
-# a coupon rate of 0.0428 and 0.047
-# That is with:
-#Bond.Proportion <- 100 #Controls what prop of fund gets invested into a Longevity Bond
-#improv.factor <- 0 
-#interest <- 7 
-#fixed_increase_rate <- 4
-#EPV.mort.risk.margin <- 10
-#reference.population.age <- 65
-# Original coupon rate was set at 0.1425
+
+
 }# Playing with the coupon rate 
 
-inital.members <- 1000
+inital.members <- 100
 Original.Fund <- c()
 reference.population.age <- 65
 Sensitivity_tests_loop_counter <- i
@@ -85,7 +77,7 @@ result <- as.data.frame(rbind(round(simulations,digits = 0),
                               round((100*VAR/Original.Fund.Avg),digits = 3),
                               Bond.Proportion,
                               improv.factor,
-                              coupon.rate*100,
+                              coupon.rate,
                               ifelse(Feature==1, "Yes","No"),
                               round(time_elapsed,digits = 3)))
 
