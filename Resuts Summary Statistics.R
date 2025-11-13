@@ -332,3 +332,5 @@ colnames(results) <- paste0("Result ", seq_along(results[1,]))
 #        y.intersp = 0.3,
 #        text.width = text_width*0.5)
 }
+
+write.csv(results, "Summary Statistics.csv")
