@@ -280,6 +280,22 @@ for(sim in 1:simulations) {
   
   mortality.forecast <- exp(ax + bx %*% t(kt_forecast))
   
+  {# Though as it is now, the mortality rate can exceed 1.
+    # The mortality improvement factor only strengthens (or weakens)
+    # he overall trend, meaning if one of the random simulations result
+    # in worsening mortality (which one of them do), the improvement factor
+    # can cause the mortality to go higher than 1.
+    
+    # Luckily we don't need to make allowance for mortality going below
+    # 0, since it is a natural boundary of the exponential function
+  }
+  
+  # Now to make sure that mortality doesn't go greater than 1
+  mortality.forecast <- exp(ax + bx %*% t(kt_forecast))
+  for(MORTALITY in 1:length(mortality.forecast)){
+    mortality.forecast[MORTALITY] <- min(mortality.forecast[MORTALITY],1)
+  }
+  
   #Let's tidy it up:
   
   mortality.forecast <- cbind(ages,mortality.forecast)
@@ -449,6 +465,22 @@ for(sim in 1:simulations) {
     # Now I have all the components to forecast my mortality
     
     mortality.forecast <- exp(ax + bx %*% t(kt_forecast))
+    
+    {# Though as it is now, the mortality rate can exceed 1.
+      # The mortality improvement factor only strengthens (or weakens)
+      # he overall trend, meaning if one of the random simulations result
+      # in worsening mortality (which one of them do), the improvement factor
+      # can cause the mortality to go higher than 1.
+      
+      # Luckily we don't need to make allowance for mortality going below
+      # 0, since it is a natural boundary of the exponential function
+    }
+    
+    # Now to make sure that mortality doesn't go greater than 1
+    mortality.forecast <- exp(ax + bx %*% t(kt_forecast))
+    for(MORTALITY in 1:length(mortality.forecast)){
+      mortality.forecast[MORTALITY] <- min(mortality.forecast[MORTALITY],1)
+    }
     
     #Let's tidy it up:
     
