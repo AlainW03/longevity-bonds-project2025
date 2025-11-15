@@ -35,7 +35,7 @@ for(i in 1:tests){
   
   # Parameters that can be changed: 
   
-  simulations <- 200 #  integer at least 1
+  simulations <- 2500 #  integer at least 1
   inital.members <- 100 #  integer at least 10
   Bond.Proportion <- 50 # value between 0 to 100
   improv.factor <- 50 # value between -100 to +100
@@ -333,4 +333,4 @@ colnames(results) <- paste0("Result ", seq_along(results[1,]))
 #        text.width = text_width*0.5)
 }
 
-write.csv(results, "Summary Statistics.csv")
+write.csv(results, "Summary Statistics (Coupon Sensitivity).csv")
