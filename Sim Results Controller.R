@@ -2,7 +2,7 @@
 # Set the parameters, and run this script at once
 # by pressing Ctrl+Alt+R
 
-simulations <- 50
+simulations <- 1
 Bond.Proportion <- 50 #Controls what prop of fund gets invested into a Longevity Bond
 improv.factor <- 50 # factor that messes with kappa's drift value
 # It takes a value between -100 to +100. The higher (lower) the value
@@ -22,7 +22,7 @@ coupon.rate <- 13.17 # value between 0 and 100
 # Original coupon rate was set at 0.1425
 }# Playing with the coupon rate 
 
-inital.members <- 100
+inital.members <- 100000
 Original.Fund <- c()
 reference.population.age <- 65
 

@@ -22,7 +22,7 @@ for(i in 1:tests){
   # Parameters that can be changed: 
   
   simulations <- 1 #  integer at least 1
-  inital.members <- 1000 #  integer at least 10
+  inital.members <- 7 #  integer at least 10
   Bond.Proportion <- 0 # value between 0 to 100
   improv.factor <- 50 # value between -100 to +100
   coupon.rate <- 13.17 # value between 0 to 100
@@ -161,7 +161,7 @@ Feature <- list("Deactivate seed", mean.age, Male.mean.age.mort, Female.mean.age
 
 
 # Now to loop the simulation
-for(j in 1:100){
+for(j in 1:1000){
   # In the merged script, I deactivated the seed if it sees Feature as a list,
   # so that every run gives me a new random forecast.
   # This doesn't effect other scripts since this is the only one sofar
@@ -286,11 +286,11 @@ colnames(Female.mean.age.mort) <- c(0:(ncol(Female.mean.age.mort)-1))
 Mean.Male.mort <- apply(Male.mean.age.mort, MARGIN = 2, mean)
 Mean.Female.mort <- apply(Female.mean.age.mort, MARGIN = 2, mean)
 
-Upper.Male.mort <- apply(Male.mean.age.mort, MARGIN = 2, max)
-Upper.Female.mort <- apply(Female.mean.age.mort, MARGIN = 2, max)
+Upper.Male.mort <- apply(Male.mean.age.mort, MARGIN = 2, function(x) quantile(x, probs = 0.975, na.rm = TRUE))
+Upper.Female.mort <- apply(Female.mean.age.mort, MARGIN = 2, function(x) quantile(x, probs = 0.975, na.rm = TRUE))
 
-Lower.Male.mort <- apply(Male.mean.age.mort, MARGIN = 2, min)
-Lower.Female.mort <- apply(Female.mean.age.mort, MARGIN = 2, min)
+Lower.Male.mort <- apply(Male.mean.age.mort, MARGIN = 2, function(x) quantile(x, probs = 0.025, na.rm = TRUE))
+Lower.Female.mort <- apply(Female.mean.age.mort, MARGIN = 2, function(x) quantile(x, probs = 0.025, na.rm = TRUE))
 
 
 
@@ -315,7 +315,7 @@ draw_fan_chart <- function(data, time_col, Mean_col, lower_col, upper_col,
   # Create ggplot object
   p <- ggplot(data, aes_string(x = time_col)) +
     # Shaded confidence interval
-    geom_ribbon(aes_string(ymin = lower_col, ymax = upper_col, fill = "'Forecast range'"), alpha = 0.4) +
+    geom_ribbon(aes_string(ymin = lower_col, ymax = upper_col, fill = "'95% CI of Forecast Range'"), alpha = 0.4) +
     # Solid line for pre-forecast
     geom_line(data = pre_forecast, aes_string(y = Mean_col, color = "'Observed'"), size = 0.7) +
     # Dashed line for forecast
@@ -325,7 +325,7 @@ draw_fan_chart <- function(data, time_col, Mean_col, lower_col, upper_col,
     # Labels and theme
     labs(title = title, x = "Time", y = "Mortality rate (q_x)") +
     scale_color_manual(values = c("Observed" = line_color, "Forecast" = line_color)) +
-    scale_fill_manual(values = c("Forecast range" = area_color)) +
+    scale_fill_manual(values = c("95% CI of Forecast Range" = area_color)) +
     theme_minimal() +
     theme(legend.position = "top")
   
